@@ -68,7 +68,7 @@
                 android:layout_margin="@dimen/default_large_margin"/>
 
         <!-- RECYCLER VIEW -->
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/activity_mentor_chat_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
@@ -101,7 +101,7 @@
                 style="@style/Widget.AppCompat.Button.Borderless"/>
 
         <!-- TEXT MESSAGE EDIT TEXT -->
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/activity_mentor_chat_message_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

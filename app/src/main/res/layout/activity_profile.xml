@@ -29,7 +29,7 @@
                     android:background="@drawable/ic_logo_auth"/>
 
             <!-- PROGRESS BAR -->
-            <ProgressBar
+            <androidx.core.widget.ContentLoadingProgressBar
                     android:id="@+id/profile_activity_progress_bar"
                     android:layout_width="30dip"
                     android:layout_height="30dip"
@@ -47,7 +47,7 @@
 
 
         <!-- PROFILE USERNAME -->
-        <com.google.android.material.textfield.TextInputEditText
+        <EditText
                 android:id="@+id/profile_activity_edit_text_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
