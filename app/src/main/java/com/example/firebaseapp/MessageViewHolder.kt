@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
+
 class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     RecyclerView.ViewHolder(inflater.inflate(R.layout.activity_mentor_chat_item, parent, false)) {
 
@@ -60,48 +61,46 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     }
 
     fun updateWithMessage(message: Message, currentUserId: String, glide: RequestManager) {
-        val isCurrentUser = message.userSender?.uid.equals(currentUserId)
 
-        //update message
+        // Check if current user is the sender
+        val isCurrentUser = message.userSender!!.uid.equals(currentUserId)
+
+        // Update message TextView
         this.textViewMessage!!.text = message.message
-        this.textViewMessage!!.textAlignment = when (isCurrentUser) {
-            true -> View.TEXT_ALIGNMENT_VIEW_END
-            false -> View.TEXT_ALIGNMENT_VIEW_START
-        }
+        this.textViewMessage!!.textAlignment = if (isCurrentUser) View.TEXT_ALIGNMENT_TEXT_END else View.TEXT_ALIGNMENT_TEXT_START
 
-        //update date
-        if (message.dateCreated != null) this.textViewDate!!.text =
-            this.convertDateToHour(message.dateCreated!!)
+        // Update date TextView
+        if (message.dateCreated != null) this.textViewDate!!.text=
+            this.convertDateToHour(
+                message.dateCreated!!
+        )
 
-        //update isMentor
-        this.imageViewIsMentor!!.visibility = when (message.userSender?.isMentor) {
-            true -> View.VISIBLE
-            else -> View.INVISIBLE
-        }
-        //update image profile
-        if (message.userSender?.urlPicture != null) {
-            glide.load(message.userSender?.urlPicture).apply(RequestOptions.circleCropTransform())
+        // Update isMentor ImageView
+        this.imageViewIsMentor!!.visibility = if (message.userSender!!.isMentor) View.VISIBLE else View.INVISIBLE
+
+        // Update profile picture ImageView
+        if (message.userSender!!.urlPicture != null)
+            glide.load(message.userSender!!.urlPicture)
+                .apply(RequestOptions.circleCropTransform())
                 .into(imageViewProfile!!)
-        }
 
-        //update profile sent
+        // Update image sent ImageView
         if (message.urlImage != null) {
-            glide.load(message.urlImage).into(imageViewSent!!)
+            glide.load(message.urlImage)
+                .into(imageViewSent!!)
             this.imageViewSent!!.visibility = View.VISIBLE
         } else {
             this.imageViewSent!!.visibility = View.GONE
         }
 
-        //update image picture
-
-
-        //update Message Bubble Color
-        (textMessageContainer!!.getBackground() as GradientDrawable).setColor(if (isCurrentUser) colorCurrentUser else colorRemoteUser)
-
+        //Update Message Bubble Color Background
+        (textMessageContainer!!.background as GradientDrawable).setColor(if (isCurrentUser) colorCurrentUser else colorRemoteUser)
 
         // Update all views alignment depending is current user or not
         this.updateDesignDependingUser(isCurrentUser)
     }
+
+
 
     private fun updateDesignDependingUser(isSender: Boolean) {
         //PROFILE CONTAINER
@@ -110,7 +109,7 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
             RelativeLayout.LayoutParams.WRAP_CONTENT
         )
         paramsLayoutHeader.addRule(if (isSender) RelativeLayout.ALIGN_PARENT_RIGHT else RelativeLayout.ALIGN_PARENT_LEFT)
-        this.profileContainer!!.setLayoutParams(paramsLayoutHeader)
+        this.profileContainer!!.layoutParams = paramsLayoutHeader
 
         //MESSAGE CONTAINER
         val paramsLayoutContent = RelativeLayout.LayoutParams(
@@ -121,7 +120,7 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
             if (isSender) RelativeLayout.LEFT_OF else RelativeLayout.RIGHT_OF,
             R.id.activity_mentor_chat_item_profile_container
         )
-        this.messageContainer!!.setLayoutParams(paramsLayoutContent)
+        this.messageContainer!!.layoutParams = paramsLayoutContent
 
         //CARDVIEW IMAGE SEND
         val paramsImageView = RelativeLayout.LayoutParams(
@@ -132,7 +131,7 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
             if (isSender) RelativeLayout.ALIGN_LEFT else RelativeLayout.ALIGN_RIGHT,
             R.id.activity_mentor_chat_item_message_container_text_message_container
         )
-        this.cardViewImageSent!!.setLayoutParams(paramsImageView)
+        this.cardViewImageSent!!.layoutParams = paramsImageView
 
         this.rootView!!.requestLayout()
     }

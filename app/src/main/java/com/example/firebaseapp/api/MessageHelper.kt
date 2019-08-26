@@ -26,9 +26,12 @@ class MessageHelper {
             chat: String,
             userSender: User
         ): Task<DocumentReference> {
+            //create the Message object
             val message = Message(textMessage,userSender =  userSender)
+
+            //store Message to Firestore
             return ChatHelper.getChatCollection().document(chat).collection(COLLECTION_NAME)
-                .add(message)
+                .add(message)//add() permet de d'ajouter un id unique au message
         }
 
         fun createMessageWithImageForChat(

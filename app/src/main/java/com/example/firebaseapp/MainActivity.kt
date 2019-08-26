@@ -51,11 +51,12 @@ class MainActivity : BaseActivity() {
     private fun handleResponseAfterSignIn(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
             val response = IdpResponse.fromResultIntent(data)
+            var urlPic:String? = null
             if (resultCode == Activity.RESULT_OK) {//SUCCESS
                 //create user in FIRESTORE
-                createUser(this.getCurrentUser()!!.uid,this.getCurrentUser()!!.displayName!!,getCurrentUser()!!.photoUrl.toString()).addOnFailureListener(this.onFailureListener())
+                createUser(this.getCurrentUser()!!.uid,this.getCurrentUser()!!.displayName!!, getCurrentUser()!!.photoUrl.toString()).addOnFailureListener(this.onFailureListener())
                // this.createUserInFirestore()
-             //   showSnackBar(coordinatorLayout!!, getString(R.string.connection_succeed))
+                showSnackBar(coordinatorLayout!!, getString(R.string.connection_succeed))
             } else {//ERRORS
                 when {
                     response == null -> showSnackBar(coordinatorLayout!!, getString(R.string.error_authentication_canceled))

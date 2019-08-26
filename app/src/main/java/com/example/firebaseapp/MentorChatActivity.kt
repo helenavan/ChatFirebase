@@ -2,12 +2,17 @@ package com.example.firebaseapp
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.core.net.toFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -20,8 +25,14 @@ import com.example.firebaseapp.models.Message
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_mentor_chat.*
+import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileInputStream
 
 import java.util.UUID
 
@@ -56,6 +67,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
             this.onClickSendMessage()
         }
         this.onClickChatButtons()
+        this.onClickAddFile()
     }
 
     override fun onRequestPermissionsResult(
@@ -80,7 +92,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     private fun onClickSendMessage() {
         if (!TextUtils.isEmpty(editTextMessage!!.text) && modelCurrentUser != null) {
             // Check if the ImageView is set
-            if (this.imageViewPreview!!.getDrawable() == null) {
+            if (this.imageViewPreview!!.drawable == null) {
                 // SEND A TEXT MESSAGE
                 MessageHelper.createMessageForChat(
                     editTextMessage!!.text!!.toString(),
@@ -110,8 +122,10 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         }
     }
 
+    @AfterPermissionGranted(RC_IMAGE_PERMS)
     private fun onClickAddFile() {
-        this.chooseImageFromPhone()
+        activity_mentor_chat_add_file_button.setOnClickListener { this.chooseImageFromPhone() }
+
     }
 
     // --------------------
@@ -126,9 +140,13 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
 
     private fun uploadPhotoInFirebaseAndSendMessage(message: String) {
         val uuid = UUID.randomUUID().toString() // GENERATE UNIQUE STRING
-        // A - UPLOAD TO GCS
+        // A - UPLOAD TO GCS and compress
         val mImageRef = FirebaseStorage.getInstance().getReference(uuid)
-        mImageRef.putFile(this.uriImageSelected!!)
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,uriImageSelected)
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG,20,stream)
+        val byteArray = stream.toByteArray()
+        mImageRef.putBytes(byteArray)
             .addOnSuccessListener(
                 this
             ) { taskSnapshot ->
@@ -166,8 +184,10 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         if (requestCode == RC_CHOOSE_PHOTO) {
             if (resultCode == RESULT_OK) { //SUCCESS
                 this.uriImageSelected = data!!.data
+               val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,uriImageSelected)
                 Glide.with(this) //SHOWING PREVIEW OF IMAGE
-                    .load(this.uriImageSelected)
+                    //.load(this.uriImageSelected)
+                    .load(this.compressBitmap(bitmap,20))
                     .apply(RequestOptions.circleCropTransform())
                     .into(this.imageViewPreview!!)
             } else {
@@ -230,5 +250,13 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         private val PERMS = Manifest.permission.READ_EXTERNAL_STORAGE
         private const val RC_IMAGE_PERMS = 100
         private val RC_CHOOSE_PHOTO = 200
+    }
+
+    private fun compressBitmap(bitmap: Bitmap, quality:Int):Bitmap{
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG,quality,stream)
+        val byteArray = stream.toByteArray()
+
+        return BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
     }
 }

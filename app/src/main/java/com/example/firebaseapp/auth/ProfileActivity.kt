@@ -72,7 +72,7 @@ class ProfileActivity : BaseActivity() {
 
     }
 
-    fun onClickDeleButton() {
+    private fun onClickDeleButton() {
         profile_activity_button_delete.setOnClickListener {
             val builder = AlertDialog.Builder(this)
 

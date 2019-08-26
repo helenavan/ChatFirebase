@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/activity_mentor_chat_item_message_container_text_message_container"
                 android:layout_alignParentBottom="true"
-                android:layout_alignRight="@id/activity_mentor_chat_item_message_container_text_message_container"
+                android:layout_alignEnd="@id/activity_mentor_chat_item_message_container_text_message_container"
                 android:textStyle="bold"
                 android:textSize="@dimen/default_text_size_mini" />
 
