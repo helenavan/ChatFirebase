@@ -8,11 +8,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 
 
-class UserHelper {
+open class UserHelper {
 
-    companion object {
+   /* companion object {
         // --- COLLECTION REFERENCE ---
-        private const val COLLECTION_NAME:String = "users"
+         const val COLLECTION_NAME:String = "users"
 
         fun getUsersCollection(): CollectionReference {
             return FirebaseFirestore.getInstance().collection(COLLECTION_NAME)
@@ -22,19 +22,19 @@ class UserHelper {
 
         fun createUser(uid: String, username: String, urlPicture: String): Task<Void> {
             val userToCreate = User(uid = uid, username = username, urlPicture = urlPicture)
-            return UserHelper.getUsersCollection().document(uid).set(userToCreate)
+            return getUsersCollection().document(uid).set(userToCreate)
         }
 
         // --- GET ---
 
         fun getUser(uid: String): Task<DocumentSnapshot> {
-            return UserHelper.getUsersCollection().document(uid).get()
+            return getUsersCollection().document(uid).get()
         }
 
         // --- UPDATE ---
 
         fun updateUsername(username: String, uid: String): Task<Void> {
-            return UserHelper.getUsersCollection().document(uid).update("username", username)
+            return getUsersCollection().document(uid).update("username", username)
         }
 
         fun updateIsMentor(uid: String, isMentor: Boolean?): Task<Void> {
@@ -46,5 +46,5 @@ class UserHelper {
         fun deleteUser(uid: String): Task<Void> {
             return UserHelper.getUsersCollection().document(uid).delete()
         }
-    }
+    }*/
 }

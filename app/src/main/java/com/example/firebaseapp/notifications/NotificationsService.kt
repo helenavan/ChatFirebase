@@ -31,7 +31,6 @@ class NotificationsService: FirebaseMessagingService() {
         }
     }
 
-    // ---
 
     private fun sendVisualNotification(messageBody: String?) {
 

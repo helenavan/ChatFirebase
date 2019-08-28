@@ -4,37 +4,34 @@ import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.core.net.toFile
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.firebaseapp.api.MessageHelper
-import com.example.firebaseapp.api.UserHelper
+import com.example.firebaseapp.api.getUser
 import com.example.firebaseapp.base.BaseActivity
 import com.example.firebaseapp.models.User
 import com.example.firebaseapp.models.Message
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.firestore.Query
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_mentor_chat.*
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileInputStream
-
-import java.util.UUID
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
 
@@ -43,22 +40,27 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     private var modelCurrentUser: User? = null
     private var currentChatName: String? = null
     private var uriImageSelected: Uri? = null
+    private var dateChat: String? = null
+    private var modelMessage: Message? = null
 
     private var editTextMessage:EditText? = null
     private var textViewRecyclerViewEmpty:TextView?= null
     private var imageViewPreview:ImageView? = null
     private var recyclerView:RecyclerView? = null
+    private var pathImageSavedInFirebase:String?= null
 
     override val fragmentLayout: Int
         get() = R.layout.activity_mentor_chat
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         recyclerView = findViewById(R.id.activity_mentor_chat_recycler_view)
         textViewRecyclerViewEmpty = findViewById(R.id.activity_mentor_chat_text_view_recycler_view_empty)
         imageViewPreview = findViewById(R.id.activity_mentor_chat_image_chosen_preview)
         editTextMessage = findViewById(R.id.activity_mentor_chat_message_edit_text)
+        dateChat = convertDateToHour()
         this.configureRecyclerView(CHAT_NAME_ANDROID)
         this.configureToolbar()
         this.getCurrentUserFromFirestore()
@@ -97,7 +99,9 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
                 MessageHelper.createMessageForChat(
                     editTextMessage!!.text!!.toString(),
                     this.currentChatName!!,
-                    modelCurrentUser!!
+                    modelCurrentUser!!,
+                    dateChat!!
+
                 ).addOnFailureListener(this.onFailureListener())
                 this.editTextMessage!!.setText("")
             } else {
@@ -133,11 +137,12 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     // --------------------
 
     private fun getCurrentUserFromFirestore() {
-        UserHelper.getUser(getCurrentUser()!!.uid).addOnSuccessListener { documentSnapshot ->
+        getUser(getCurrentUser()!!.uid).addOnSuccessListener { documentSnapshot ->
             modelCurrentUser = documentSnapshot.toObject<User>(User::class.java)
         }
     }
 
+    //upload a picture in Firebase ans send a message
     private fun uploadPhotoInFirebaseAndSendMessage(message: String) {
         val uuid = UUID.randomUUID().toString() // GENERATE UNIQUE STRING
         // A - UPLOAD TO GCS and compress
@@ -150,10 +155,11 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
             .addOnSuccessListener(
                 this
             ) { taskSnapshot ->
-                val pathImageSavedInFirebase = taskSnapshot.metadata!!.toString()
+                pathImageSavedInFirebase = taskSnapshot.metadata!!.toString()
+                Log.e("MentorAct", "path image from storage : $pathImageSavedInFirebase")
                 // B - SAVE MESSAGE IN FIRESTORE
                 MessageHelper.createMessageWithImageForChat(
-                    pathImageSavedInFirebase,
+                    pathImageSavedInFirebase!!,
                     message,
                     currentChatName!!,
                     modelCurrentUser!!
@@ -210,7 +216,6 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         //Configure Adapter & RecyclerView
         this.mentorChatAdapter = MentorChatAdapter(
             generateOptionsForAdapter(MessageHelper.getAllMessageForChat(this.currentChatName!!)),
-            Glide.with(this),
             this,
             this.getCurrentUser()!!.uid
         )
@@ -220,8 +225,9 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
                 recyclerView!!.smoothScrollToPosition(mentorChatAdapter!!.itemCount) // Scroll to bottom on new messages
             }
         })
-        recyclerView!!.layoutManager = LinearLayoutManager(applicationContext)
+        recyclerView!!.layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL, true)
         recyclerView!!.adapter = this.mentorChatAdapter
+        recyclerView!!.adapter!!.notifyDataSetChanged()
     }
 
     private fun generateOptionsForAdapter(query: Query): FirestoreRecyclerOptions<Message> {
@@ -258,5 +264,13 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         val byteArray = stream.toByteArray()
 
         return BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun convertDateToHour(): String {
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+
+        return current.format(formatter)
     }
 }

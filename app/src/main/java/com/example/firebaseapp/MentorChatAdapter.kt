@@ -1,7 +1,10 @@
 package com.example.firebaseapp
 
+import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import com.bumptech.glide.RequestManager
 import com.example.firebaseapp.models.Message
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
@@ -10,7 +13,6 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 
 class MentorChatAdapter(
     options: FirestoreRecyclerOptions<Message>, //FOR DATA
-    private val glide: RequestManager, //FOR COMMUNICATION
     private val callback: Listener, private val idCurrentUser: String
 ) : FirestoreRecyclerAdapter<Message, MessageViewHolder>(options) {
 
@@ -18,13 +20,26 @@ class MentorChatAdapter(
         fun onDataChanged()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int, model: Message) {
-        holder.updateWithMessage(model, this.idCurrentUser, this.glide)
+        holder.updateWithMessage(model, this.idCurrentUser)
+        Log.e("ADAPTER", "set image sent ====> ${model.urlImage.toString()}")
+        Log.e("ADAPTER", "set date ====> ${model.dateCreated.toString()}")
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+/*    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return MessageViewHolder(inflater, parent)
+    }*/
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+        return MessageViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.activity_mentor_chat_item, parent, false)
+        )
+    }
+
+    override fun getItemCount(): Int {
+        return super.getItemCount()
     }
 
     override fun onDataChanged() {

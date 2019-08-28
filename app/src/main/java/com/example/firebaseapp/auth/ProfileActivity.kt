@@ -10,14 +10,11 @@ import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
 import android.widget.EditText
+import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.firebaseapp.R
-import com.example.firebaseapp.api.UserHelper
-import com.example.firebaseapp.api.UserHelper.Companion.deleteUser
-import com.example.firebaseapp.api.UserHelper.Companion.getUser
-import com.example.firebaseapp.api.UserHelper.Companion.updateIsMentor
-import com.example.firebaseapp.api.UserHelper.Companion.updateUsername
+import com.example.firebaseapp.api.*
 import com.example.firebaseapp.base.BaseActivity
 import com.example.firebaseapp.models.User
 import com.firebase.ui.auth.AuthUI
@@ -28,8 +25,6 @@ import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.view.*
 
 
-
-
 private const val SIGN_OUT_TASK: Int = 10
 private const val DELETE_USER_TASK = 20
 private const val UPDATE_USERNAME: Int = 30
@@ -37,6 +32,7 @@ private const val UPDATE_USERNAME: Int = 30
 class ProfileActivity : BaseActivity() {
 
     private var textInputEditTextUsername: EditText? = null
+    private var imageProfil:ImageView? = null
 
     override val fragmentLayout: Int
         get() = R.layout.activity_profile
@@ -44,6 +40,7 @@ class ProfileActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         textInputEditTextUsername = findViewById(R.id.profile_activity_edit_text_username)
+        imageProfil = findViewById(R.id.profile_activity_imageview_profile)
         this.onClickDeleButton()
         this.onClickSignOutButton()
         this.onClickUpdateButton()
@@ -55,14 +52,12 @@ class ProfileActivity : BaseActivity() {
         profile_activity_button_update.setOnClickListener {
             this.updateUsernameInFirebase()
         }
-
     }
 
     fun onClickCheckBoxMentor() {
         profile_activity_check_box_is_mentor.setOnClickListener {
             this.updateUserIsMentor()
         }
-
     }
 
     private fun onClickSignOutButton() {
@@ -89,17 +84,11 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun updateUIWhenCreating() {
-        Log.e("MainActivity", "UpdateUIWhenCreating ===>")
+
         var email: String? = null
         if (this.getCurrentUser() != null) {
-
+            Log.e("ProfilActivity", "UpdateUIWhenCreating photo ===> ${getCurrentUser()!!.photoUrl}")
             //Get picture URL from Firebase
-            if (this.getCurrentUser()!!.photoUrl != null) {
-                Glide.with(this)
-                    .load(this.getCurrentUser()!!.photoUrl)
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(profile_activity_imageview_profile)
-            }
 
             //Get email & username from Firebase
             email =
@@ -112,7 +101,14 @@ class ProfileActivity : BaseActivity() {
             getUser(this.getCurrentUser()!!.uid)
                 .addOnSuccessListener { documentSnapshot ->
                     val currentUser = documentSnapshot.toObject(User::class.java)
-                    Log.e("MainActivity", "username ===>${currentUser!!.username}")
+                    if (this.getCurrentUser()!!.photoUrl != null) {
+                        Glide.with(applicationContext)
+                            .load(currentUser!!.urlPicture)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(imageProfil!!)
+                    }
+                  //  Log.e("ProfilActivity", "username ===>${currentUser!!.username}")
+                    Log.e("ProfilActivity", "in getUser =>phot url ===> ${currentUser!!.urlPicture}")
                     val username =
                         if (TextUtils.isEmpty(currentUser!!.username)) getString(R.string.info_no_username_found) else currentUser.username
 
@@ -148,13 +144,12 @@ class ProfileActivity : BaseActivity() {
         this.profile_activity_progress_bar.visibility = View.VISIBLE
         val username: String = textInputEditTextUsername!!.text.toString()
         if (this.getCurrentUser() != null) {
-            if (!username.isEmpty() && !username.equals(getString(R.string.info_no_username_found))) {
+            if (username.isNotEmpty() && !username.equals(getString(R.string.info_no_username_found))) {
                 updateUsername(
                     username,
                     getCurrentUser()!!.uid
                 ).addOnFailureListener(this.onFailureListener())
                     .addOnSuccessListener(this.updateUIAfterRESTRequestsCompleted(UPDATE_USERNAME))
-
             }
         }
     }
@@ -178,5 +173,4 @@ class ProfileActivity : BaseActivity() {
             }
         }
     }
-
 }

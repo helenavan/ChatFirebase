@@ -1,7 +1,11 @@
 package com.example.firebaseapp
 
+import android.app.Activity
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,20 +13,24 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.example.firebaseapp.models.Message
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
 
-class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
-    RecyclerView.ViewHolder(inflater.inflate(R.layout.activity_mentor_chat_item, parent, false)) {
+class MessageViewHolder(item:View) :
+    RecyclerView.ViewHolder(item) {
 
     private var colorCurrentUser: Int = 0
     private var colorRemoteUser: Int = 0
@@ -32,7 +40,7 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     private var imageViewIsMentor: ImageView? = null
     private var messageContainer: RelativeLayout? = null
     private var cardViewImageSent: CardView? = null
-    private var imageViewSent: ImageView? = null
+    private var imageViewSent: ImageView
     private var textMessageContainer: LinearLayout? = null
     private var textViewMessage: TextView? = null
     private var textViewDate: TextView? = null
@@ -43,14 +51,14 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
 
         rootView = itemView.findViewById(R.id.activity_mentor_chat_item_root_view)
         profileContainer = itemView.findViewById(R.id.activity_mentor_chat_item_profile_container)
-        imageViewProfile =
+        this.imageViewProfile =
             itemView.findViewById(R.id.activity_mentor_chat_item_profile_container_profile_image)
         imageViewIsMentor =
             itemView.findViewById(R.id.activity_mentor_chat_item_profile_container_is_mentor_image)
         messageContainer = itemView.findViewById(R.id.activity_mentor_chat_item_message_container)
-        cardViewImageSent =
+        this.cardViewImageSent =
             itemView.findViewById(R.id.activity_mentor_chat_item_message_container_image_sent_cardview)
-        imageViewSent =
+        this.imageViewSent =
             itemView.findViewById(R.id.activity_mentor_chat_item_message_container_image_sent_cardview_image)
         textMessageContainer =
             itemView.findViewById(R.id.activity_mentor_chat_item_message_container_text_message_container)
@@ -60,7 +68,8 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
             itemView.findViewById(R.id.activity_mentor_chat_item_message_container_text_view_date)
     }
 
-    fun updateWithMessage(message: Message, currentUserId: String, glide: RequestManager) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateWithMessage(message: Message, currentUserId: String) {
 
         // Check if current user is the sender
         val isCurrentUser = message.userSender!!.uid.equals(currentUserId)
@@ -70,24 +79,27 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         this.textViewMessage!!.textAlignment = if (isCurrentUser) View.TEXT_ALIGNMENT_TEXT_END else View.TEXT_ALIGNMENT_TEXT_START
 
         // Update date TextView
-        if (message.dateCreated != null) this.textViewDate!!.text=
-            this.convertDateToHour(
-                message.dateCreated!!
-        )
+        if(message.dateCreated != null)
+        textViewDate!!.text= message.dateCreated
 
         // Update isMentor ImageView
         this.imageViewIsMentor!!.visibility = if (message.userSender!!.isMentor) View.VISIBLE else View.INVISIBLE
 
         // Update profile picture ImageView
         if (message.userSender!!.urlPicture != null)
-            glide.load(message.userSender!!.urlPicture)
+            Glide.with(itemView)
+                .load(message.userSender!!.urlPicture)
                 .apply(RequestOptions.circleCropTransform())
                 .into(imageViewProfile!!)
 
         // Update image sent ImageView
         if (message.urlImage != null) {
-            glide.load(message.urlImage)
-                .into(imageViewSent!!)
+            Log.e("HOLDER", "urlImage ======> ${message.urlImage}")
+            Glide.with(itemView)
+                .load(message.urlImage)
+                .into(imageViewSent)
+/*            glide.load(message.urlImage)
+                .into(imageViewSent!!)*/
             this.imageViewSent!!.visibility = View.VISIBLE
         } else {
             this.imageViewSent!!.visibility = View.GONE
@@ -134,10 +146,5 @@ class MessageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         this.cardViewImageSent!!.layoutParams = paramsImageView
 
         this.rootView!!.requestLayout()
-    }
-
-    private fun convertDateToHour(date: Date): String {
-        val dfTime: DateFormat = SimpleDateFormat("HH:mm", Locale.FRANCE)
-        return dfTime.format(date)
     }
 }

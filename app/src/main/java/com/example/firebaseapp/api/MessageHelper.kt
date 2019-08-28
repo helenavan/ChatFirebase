@@ -6,7 +6,7 @@ import com.example.firebaseapp.models.User
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.DocumentReference
 import com.google.android.gms.tasks.Task
-
+import java.util.*
 
 
 private const val COLLECTION_NAME = "messages"
@@ -24,10 +24,11 @@ class MessageHelper {
         fun createMessageForChat(
             textMessage: String,
             chat: String,
-            userSender: User
+            userSender: User,
+            dateMessage:String
         ): Task<DocumentReference> {
             //create the Message object
-            val message = Message(textMessage,userSender =  userSender)
+            val message = Message(textMessage,userSender =  userSender, dateCreated =dateMessage )
 
             //store Message to Firestore
             return ChatHelper.getChatCollection().document(chat).collection(COLLECTION_NAME)
