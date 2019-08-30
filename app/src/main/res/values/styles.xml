@@ -15,7 +15,7 @@
         <item name="actionBarTheme">@null</item>
     </style>
 
-    <!-- STYLE SIGN-IN ACTIVITY -->
+    <!-- STYLE SIGN-IN ACTIVITY FOR EDITTEXT-->
     <style name="LoginTheme" parent="AppTheme">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,8 +20,17 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.module.AppGlideModule
 import com.bumptech.glide.request.RequestOptions
+import com.example.firebaseapp.base.GlideApp
+
 import com.example.firebaseapp.models.Message
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.storage.FileDownloadTask
+import com.google.firebase.storage.FileDownloadTask.TaskSnapshot
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
+import java.lang.Exception
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -28,8 +38,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 
-
-class MessageViewHolder(item:View) :
+class MessageViewHolder(item: View) :
     RecyclerView.ViewHolder(item) {
 
     private var colorCurrentUser: Int = 0
@@ -73,17 +82,19 @@ class MessageViewHolder(item:View) :
 
         // Check if current user is the sender
         val isCurrentUser = message.userSender!!.uid.equals(currentUserId)
-
+        val storageReference = FirebaseStorage.getInstance().reference
         // Update message TextView
         this.textViewMessage!!.text = message.message
-        this.textViewMessage!!.textAlignment = if (isCurrentUser) View.TEXT_ALIGNMENT_TEXT_END else View.TEXT_ALIGNMENT_TEXT_START
+        this.textViewMessage!!.textAlignment =
+            if (isCurrentUser) View.TEXT_ALIGNMENT_TEXT_END else View.TEXT_ALIGNMENT_TEXT_START
 
         // Update date TextView
-        if(message.dateCreated != null)
-        textViewDate!!.text= message.dateCreated
+        if (message.dateCreated != null)
+            textViewDate!!.text = message.dateCreated
 
         // Update isMentor ImageView
-        this.imageViewIsMentor!!.visibility = if (message.userSender!!.isMentor) View.VISIBLE else View.INVISIBLE
+        this.imageViewIsMentor!!.visibility =
+            if (message.userSender!!.isMentor) View.VISIBLE else View.INVISIBLE
 
         // Update profile picture ImageView
         if (message.userSender!!.urlPicture != null)
@@ -94,12 +105,12 @@ class MessageViewHolder(item:View) :
 
         // Update image sent ImageView
         if (message.urlImage != null) {
-            Log.e("HOLDER", "urlImage ======> ${message.urlImage}")
-            Glide.with(itemView)
-                .load(message.urlImage)
+
+            GlideApp.with(itemView.context)
+                .load(storageReference.child(message.urlImage.toString()))
+                .placeholder(R.mipmap.ic_launcher_round)
                 .into(imageViewSent)
-/*            glide.load(message.urlImage)
-                .into(imageViewSent!!)*/
+
             this.imageViewSent!!.visibility = View.VISIBLE
         } else {
             this.imageViewSent!!.visibility = View.GONE
@@ -108,11 +119,9 @@ class MessageViewHolder(item:View) :
         //Update Message Bubble Color Background
         (textMessageContainer!!.background as GradientDrawable).setColor(if (isCurrentUser) colorCurrentUser else colorRemoteUser)
 
-        // Update all views alignment depending is current user or not
+        // Update all com.example.firebaseapp.views alignment depending is current user or not
         this.updateDesignDependingUser(isCurrentUser)
     }
-
-
 
     private fun updateDesignDependingUser(isSender: Boolean) {
         //PROFILE CONTAINER
@@ -143,6 +152,7 @@ class MessageViewHolder(item:View) :
             if (isSender) RelativeLayout.ALIGN_LEFT else RelativeLayout.ALIGN_RIGHT,
             R.id.activity_mentor_chat_item_message_container_text_message_container
         )
+
         this.cardViewImageSent!!.layoutParams = paramsImageView
 
         this.rootView!!.requestLayout()

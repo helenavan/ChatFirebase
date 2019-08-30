@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.firebaseapp.api.MessageHelper
+import com.example.firebaseapp.api.MessageHelper.Companion.getAllMessageForChat
 import com.example.firebaseapp.api.getUser
 import com.example.firebaseapp.base.BaseActivity
 import com.example.firebaseapp.models.User
@@ -43,21 +44,21 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     private var dateChat: String? = null
     private var modelMessage: Message? = null
 
-    private var editTextMessage:EditText? = null
-    private var textViewRecyclerViewEmpty:TextView?= null
-    private var imageViewPreview:ImageView? = null
-    private var recyclerView:RecyclerView? = null
-    private var pathImageSavedInFirebase:String?= null
+    private var editTextMessage: EditText? = null
+    private var textViewRecyclerViewEmpty: TextView? = null
+    private var imageViewPreview: ImageView? = null
+    private var recyclerView: RecyclerView? = null
+    // private var pathImageSavedInFirebase: String? = null
 
     override val fragmentLayout: Int
         get() = R.layout.activity_mentor_chat
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         recyclerView = findViewById(R.id.activity_mentor_chat_recycler_view)
-        textViewRecyclerViewEmpty = findViewById(R.id.activity_mentor_chat_text_view_recycler_view_empty)
+        textViewRecyclerViewEmpty =
+            findViewById(R.id.activity_mentor_chat_text_view_recycler_view_empty)
         imageViewPreview = findViewById(R.id.activity_mentor_chat_image_chosen_preview)
         editTextMessage = findViewById(R.id.activity_mentor_chat_message_edit_text)
         dateChat = convertDateToHour()
@@ -65,7 +66,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         this.configureToolbar()
         this.getCurrentUserFromFirestore()
 
-        activity_mentor_chat_send_button.setOnClickListener{
+        activity_mentor_chat_send_button.setOnClickListener {
             this.onClickSendMessage()
         }
         this.onClickChatButtons()
@@ -114,15 +115,15 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     }
 
     private fun onClickChatButtons() {
-        activity_mentor_chat_android_chat_button.setOnClickListener{
+        activity_mentor_chat_android_chat_button.setOnClickListener {
             this.configureRecyclerView(CHAT_NAME_ANDROID)
         }
-        activity_mentor_chat_firebase_chat_button.setOnClickListener{
+        activity_mentor_chat_firebase_chat_button.setOnClickListener {
             this.configureRecyclerView(CHAT_NAME_FIREBASE)
         }
-        activity_mentor_chat_bug_chat_button.setOnClickListener{
+        activity_mentor_chat_bug_chat_button.setOnClickListener {
             this.configureRecyclerView(CHAT_NAME_BUG)
-            Toast.makeText(this,"message $CHAT_NAME_BUG",Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "message $CHAT_NAME_BUG", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -147,22 +148,25 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         val uuid = UUID.randomUUID().toString() // GENERATE UNIQUE STRING
         // A - UPLOAD TO GCS and compress
         val mImageRef = FirebaseStorage.getInstance().getReference(uuid)
-        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,uriImageSelected)
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uriImageSelected)
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG,20,stream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream)
         val byteArray = stream.toByteArray()
         mImageRef.putBytes(byteArray)
             .addOnSuccessListener(
                 this
             ) { taskSnapshot ->
-                pathImageSavedInFirebase = taskSnapshot.metadata!!.toString()
+                val pathImageSavedInFirebase = taskSnapshot.storage.path
+                val storageReference = FirebaseStorage.getInstance().reference.child(uuid)
                 Log.e("MentorAct", "path image from storage : $pathImageSavedInFirebase")
+                Log.e("MentorAct", "pathPhoto : $storageReference")
                 // B - SAVE MESSAGE IN FIRESTORE
                 MessageHelper.createMessageWithImageForChat(
-                    pathImageSavedInFirebase!!,
+                    pathImageSavedInFirebase,
                     message,
                     currentChatName!!,
-                    modelCurrentUser!!
+                    modelCurrentUser!!,
+                    dateChat!!
                 ).addOnFailureListener(onFailureListener())
             }
             .addOnFailureListener(this.onFailureListener())
@@ -190,10 +194,10 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         if (requestCode == RC_CHOOSE_PHOTO) {
             if (resultCode == RESULT_OK) { //SUCCESS
                 this.uriImageSelected = data!!.data
-               val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,uriImageSelected)
+                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uriImageSelected)
                 Glide.with(this) //SHOWING PREVIEW OF IMAGE
                     //.load(this.uriImageSelected)
-                    .load(this.compressBitmap(bitmap,20))
+                    .load(this.compressBitmap(bitmap, 20))
                     .apply(RequestOptions.circleCropTransform())
                     .into(this.imageViewPreview!!)
             } else {
@@ -215,19 +219,24 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         this.currentChatName = chatName
         //Configure Adapter & RecyclerView
         this.mentorChatAdapter = MentorChatAdapter(
-            generateOptionsForAdapter(MessageHelper.getAllMessageForChat(this.currentChatName!!)),
+            generateOptionsForAdapter(getAllMessageForChat(this.currentChatName!!)),
             this,
             this.getCurrentUser()!!.uid
         )
+        mentorChatAdapter!!.setHasStableIds(true)
+        mentorChatAdapter!!.notifyDataSetChanged()
         mentorChatAdapter!!.registerAdapterDataObserver(object :
             RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+
                 recyclerView!!.smoothScrollToPosition(mentorChatAdapter!!.itemCount) // Scroll to bottom on new messages
             }
         })
-        recyclerView!!.layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL, true)
-        recyclerView!!.adapter = this.mentorChatAdapter
+        recyclerView!!.layoutManager =
+            LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, true)
+        recyclerView!!.adapter = this.mentorChatAdapter!!
         recyclerView!!.adapter!!.notifyDataSetChanged()
+
     }
 
     private fun generateOptionsForAdapter(query: Query): FirestoreRecyclerOptions<Message> {
@@ -242,7 +251,8 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     // --------------------
 
     override fun onDataChanged() {
-        textViewRecyclerViewEmpty!!.visibility = if (this.mentorChatAdapter!!.itemCount == 0) View.VISIBLE else View.GONE
+        textViewRecyclerViewEmpty!!.visibility =
+            if (this.mentorChatAdapter!!.itemCount == 0) View.VISIBLE else View.GONE
     }
 
     companion object {
@@ -258,18 +268,18 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         private val RC_CHOOSE_PHOTO = 200
     }
 
-    private fun compressBitmap(bitmap: Bitmap, quality:Int):Bitmap{
+    private fun compressBitmap(bitmap: Bitmap, quality: Int): Bitmap {
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG,quality,stream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
         val byteArray = stream.toByteArray()
 
-        return BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun convertDateToHour(): String {
         val current = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM")
 
         return current.format(formatter)
     }

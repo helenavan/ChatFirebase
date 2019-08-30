@@ -39,9 +39,10 @@ class MessageHelper {
             urlImage: String,
             textMessage: String,
             chat: String,
-            userSender: User
+            userSender: User,
+            dateMessage: String
         ): Task<DocumentReference> {
-            val message = Message(textMessage,urlImage =  urlImage, userSender = userSender)
+            val message = Message(textMessage,urlImage =  urlImage, userSender = userSender, dateCreated = dateMessage)
             return ChatHelper.getChatCollection().document(chat).collection(COLLECTION_NAME)
                 .add(message)
         }

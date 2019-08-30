@@ -23,8 +23,7 @@ class MentorChatAdapter(
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int, model: Message) {
         holder.updateWithMessage(model, this.idCurrentUser)
-        Log.e("ADAPTER", "set image sent ====> ${model.urlImage.toString()}")
-        Log.e("ADAPTER", "set date ====> ${model.dateCreated.toString()}")
+        Log.e("ADAPTER", "set position message sent ====> ${model.message} $position")
     }
 
 /*    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -40,6 +39,10 @@ class MentorChatAdapter(
 
     override fun getItemCount(): Int {
         return super.getItemCount()
+    }
+
+    override fun getItemId(position: Int): Long {
+        return super.getItemId(position)
     }
 
     override fun onDataChanged() {

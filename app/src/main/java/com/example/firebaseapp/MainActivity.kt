@@ -2,13 +2,18 @@ package com.example.firebaseapp
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.example.firebaseapp.api.UserHelper
 import com.example.firebaseapp.api.createUser
 import com.example.firebaseapp.auth.ProfileActivity
 import com.example.firebaseapp.base.BaseActivity
+import com.example.firebaseapp.views.showSnackBar
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
@@ -20,7 +25,7 @@ private const val RC_SIGN_IN: Int = 123
 
 class MainActivity : BaseActivity() {
 
-    private var coordinatorLayout: CoordinatorLayout? = null
+    private var coordinatorLayout: ConstraintLayout? = null
     private var buttonLogin: Button? = null
 
     override val fragmentLayout: Int
@@ -44,10 +49,6 @@ class MainActivity : BaseActivity() {
         this.handleResponseAfterSignIn(requestCode, resultCode, data)
     }
 
-    //show Snack Bar with a message
-    private fun showSnackBar(coordinatorLayout: CoordinatorLayout, message: String) {
-        Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_INDEFINITE)
-    }
 
     private fun handleResponseAfterSignIn(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
@@ -91,7 +92,8 @@ class MainActivity : BaseActivity() {
             if (this.isCurrentUserLogged()) {
                 this.startMentorChatActicity()
             } else {
-                this.showSnackBar(this.coordinatorLayout!!, getString(R.string.error_not_connected))
+
+                showSnackBar(this.coordinatorLayout!!, getString(R.string.error_not_connected))
             }
         }
     }
@@ -136,7 +138,11 @@ class MainActivity : BaseActivity() {
     private fun createUserInFirestore() {
 
         if (this.getCurrentUser() != null) {
-         createUser(this.getCurrentUser()!!.uid,this.getCurrentUser()!!.displayName!!, this.getCurrentUser()!!.photoUrl.toString() )
+            createUser(
+                this.getCurrentUser()!!.uid,
+                this.getCurrentUser()!!.displayName!!,
+                this.getCurrentUser()!!.photoUrl.toString()
+            )
                 .addOnFailureListener(this.onFailureListener())
         }
     }

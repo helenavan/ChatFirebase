@@ -94,7 +94,7 @@ class ProfileActivity : BaseActivity() {
             email =
                 if (TextUtils.isEmpty(this.getCurrentUser()!!.email)) getString(R.string.info_no_email_found) else this.getCurrentUser()!!.email
 
-            //Update views with data
+            //Update com.example.firebaseapp.views with data
             this.profile_activity_text_view_email.text = email
 
             // 5 - Get additional data from Firestore
