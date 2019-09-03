@@ -20,6 +20,8 @@ import com.example.firebaseapp.models.User
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_profile.*
@@ -48,7 +50,6 @@ class ProfileActivity : BaseActivity() {
         this.onClickDeleButton()
         this.onClickSignOutButton()
         this.onClickUpdateButton()
-       // this.updateUI()
         this.updateUIWhenCreating()
         //  this.onClickCheckBoxMentor()
     }
@@ -127,7 +128,7 @@ class ProfileActivity : BaseActivity() {
                         if (TextUtils.isEmpty(currentUser!!.username)) getString(R.string.info_no_username_found) else currentUser.username
                     Log.e(
                         "ProfilActivity",
-                        "DISPLAYNAME ===> ${getCurrentUser()!!.displayName}" + "CURENTUSER ==> ${currentUser.username}"
+                        "DISPLAYNAME ===> ${FirebaseAuth.getInstance().currentUser!!.displayName}" + "CURENTUSER ==> ${currentUser.username}"
                     )
                     // this.profile_activity_check_box_is_mentor.isChecked = currentUser.isMentor!!
                     textInputEditTextUsername!!.setText(username)
@@ -135,6 +136,7 @@ class ProfileActivity : BaseActivity() {
         }
     }
 
+    //update en temps réel
     private fun updateUI() {
         var email: String? = null
         if (this.getCurrentUser() != null) {
@@ -186,8 +188,16 @@ class ProfileActivity : BaseActivity() {
                     getCurrentUser()!!.uid
                 ).addOnFailureListener(this.onFailureListener())
                     .addOnSuccessListener(this.updateUIAfterRESTRequestsCompleted(UPDATE_USERNAME))
+                changeNameAuth(username)
             }
         }
+    }
+
+    private fun changeNameAuth(username:String){
+        val profileUpdates = UserProfileChangeRequest.Builder()
+            .setDisplayName(username)
+            .build()
+        this.getCurrentUser()!!.updateProfile(profileUpdates)
     }
 
     private fun updateUserIsMentor() {
@@ -209,4 +219,5 @@ class ProfileActivity : BaseActivity() {
             }
         }
     }
+
 }

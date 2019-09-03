@@ -36,7 +36,7 @@
                     android:id="@+id/profile_activity_imageview_profile"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    app:srcCompat="@drawable/ic_anon_user_48dp"/>
+                    app:srcCompat="@drawable/ic_moustache480px"/>
 
         </LinearLayout>
 
