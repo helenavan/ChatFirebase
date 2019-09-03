@@ -2,14 +2,10 @@ package com.example.firebaseapp
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.example.firebaseapp.api.UserHelper
 import com.example.firebaseapp.api.createUser
 import com.example.firebaseapp.auth.ProfileActivity
 import com.example.firebaseapp.base.BaseActivity
@@ -17,7 +13,6 @@ import com.example.firebaseapp.views.showSnackBar
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -92,7 +87,6 @@ class MainActivity : BaseActivity() {
             if (this.isCurrentUserLogged()) {
                 this.startMentorChatActicity()
             } else {
-
                 showSnackBar(this.coordinatorLayout!!, getString(R.string.error_not_connected))
             }
         }
@@ -133,10 +127,9 @@ class MainActivity : BaseActivity() {
     }
 
     // --------------------
-    // REST REQUEST
+    // REST REQUEST when disconnect and reconnect
     // --------------------
     private fun createUserInFirestore() {
-
         if (this.getCurrentUser() != null) {
             createUser(
                 this.getCurrentUser()!!.uid,
@@ -145,5 +138,6 @@ class MainActivity : BaseActivity() {
             )
                 .addOnFailureListener(this.onFailureListener())
         }
+        Log.e("MainActivity", "getCurrentuser displayname==> ${getCurrentUser()!!.displayName}")
     }
 }

@@ -4,6 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#ffffff"
         tools:context="com.example.firebaseapp.MentorChatActivity">
 
     <!-- BUTTONS CHAT CONTAINER -->
@@ -38,11 +39,11 @@
         <!-- BUTTON CHAT BUG -->
         <ImageButton
                 android:id="@+id/activity_mentor_chat_bug_chat_button"
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="50dip"
                 android:layout_weight="1"
                 android:background="@color/colorSand"
-                android:src="@drawable/ic_bug_report_white_24dp"
+                android:src="@drawable/ic_cloud_white_24dp"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:tag="30"/>
 
@@ -71,7 +72,8 @@
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/activity_mentor_chat_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_marginBottom="64dp"/>
 
     </LinearLayout>
 

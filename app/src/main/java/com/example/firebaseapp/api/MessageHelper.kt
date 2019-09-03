@@ -13,6 +13,7 @@ private const val COLLECTION_NAME = "messages"
 
 class MessageHelper {
     companion object{
+        //query pour affiner un e recherche à travers une collection
         fun getAllMessageForChat(chat: String): Query {
             return getChatCollection()
                 .document(chat)

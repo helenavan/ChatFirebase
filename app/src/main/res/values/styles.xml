@@ -13,6 +13,7 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="actionBarTheme">@null</item>
+        <item name="android:fontFamily">@font/corben_regular</item>
     </style>
 
     <!-- STYLE SIGN-IN ACTIVITY FOR EDITTEXT-->
@@ -31,6 +32,11 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:textColorHint">@android:color/white</item>
+    </style>
+
+    <!-- FONT -->
+    <style name="AppTheme.AppBarOverlay" parent="AppTheme" >
+        <item name="android:fontFamily">@font/dosis_regular</item>
     </style>
 
 </resources>

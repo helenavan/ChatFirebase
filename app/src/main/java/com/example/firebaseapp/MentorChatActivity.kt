@@ -62,6 +62,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         imageViewPreview = findViewById(R.id.activity_mentor_chat_image_chosen_preview)
         editTextMessage = findViewById(R.id.activity_mentor_chat_message_edit_text)
         dateChat = convertDateToHour()
+        //show chat
         this.configureRecyclerView(CHAT_NAME_ANDROID)
         this.configureToolbar()
         this.getCurrentUserFromFirestore()
@@ -123,7 +124,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         }
         activity_mentor_chat_bug_chat_button.setOnClickListener {
             this.configureRecyclerView(CHAT_NAME_BUG)
-            Toast.makeText(this, "message $CHAT_NAME_BUG", Toast.LENGTH_LONG).show()
+
         }
     }
 
@@ -150,7 +151,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         val mImageRef = FirebaseStorage.getInstance().getReference(uuid)
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uriImageSelected)
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream)
         val byteArray = stream.toByteArray()
         mImageRef.putBytes(byteArray)
             .addOnSuccessListener(

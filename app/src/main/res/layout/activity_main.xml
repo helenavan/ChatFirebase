@@ -11,12 +11,13 @@
     <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/wallpaper"
+            android:background="#ffffff"
             android:scaleType="centerCrop"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"/>
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -27,7 +28,7 @@
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_logo_auth"
+                android:background="@drawable/ic_digital_library"
                 android:layout_margin="@dimen/default_large_margin"/>
 
         <!-- TITLE FIREBASE OC -->
@@ -37,7 +38,8 @@
                 android:text="@string/app_name"
                 android:textSize="@dimen/default_title_size"
                 android:textStyle="bold"
-                android:textColor="#ffffff"
+                android:textColor="#2f3032"
+                app:fontFamily="@font/corben_regular"
                 android:layout_margin="@dimen/default_margin"/>
 
         <!-- DESCRIPTION FIREBASE OC -->
@@ -46,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/default_text_size"
                 android:text="@string/main_activity_description"
-                android:textColor="#ffffff"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_margin="@dimen/default_margin"/>
 
         <!-- BUTTONS CONTAINER -->

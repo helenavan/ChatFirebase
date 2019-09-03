@@ -3,6 +3,7 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="#ffffff"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               tools:context="com.example.firebaseapp.auth.ProfileActivity"
               android:orientation="vertical"
@@ -16,31 +17,25 @@
             android:orientation="vertical"
             android:layout_weight="1">
 
+        <!-- PROGRESS BAR -->
+        <androidx.core.widget.ContentLoadingProgressBar
+                android:id="@+id/profile_activity_progress_bar"
+                android:layout_width="30dip"
+                android:layout_height="30dip"
+                android:visibility="invisible"
+                android:layout_margin="@dimen/default_large_margin"/>
+
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_margin="@dimen/default_large_margin">
 
-            <!-- FIREBASE IMAGE -->
-            <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/ic_logo_auth"/>
-
-            <!-- PROGRESS BAR -->
-            <androidx.core.widget.ContentLoadingProgressBar
-                    android:id="@+id/profile_activity_progress_bar"
-                    android:layout_width="30dip"
-                    android:layout_height="30dip"
-                    android:visibility="invisible"
-                    android:layout_margin="@dimen/default_large_margin"/>
-
             <!-- PROFILE IMAGE -->
             <ImageView
                     android:id="@+id/profile_activity_imageview_profile"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     app:srcCompat="@drawable/ic_anon_user_48dp"/>
 
         </LinearLayout>
@@ -80,11 +75,13 @@
         </LinearLayout>
 
         <!-- CHECKBOX IS USER MENTOR -->
+<!--
         <CheckBox
                 android:id="@+id/profile_activity_check_box_is_mentor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/check_box_is_mentor"/>
+-->
 
 
 

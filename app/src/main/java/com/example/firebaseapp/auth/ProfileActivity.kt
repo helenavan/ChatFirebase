@@ -21,6 +21,7 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.view.*
 
@@ -32,7 +33,10 @@ private const val UPDATE_USERNAME: Int = 30
 class ProfileActivity : BaseActivity() {
 
     private var textInputEditTextUsername: EditText? = null
-    private var imageProfil:ImageView? = null
+    private var imageProfil: ImageView? = null
+    private val firestoreUser by lazy {
+        FirebaseFirestore.getInstance().collection("users").document(getCurrentUser()!!.uid)
+    }
 
     override val fragmentLayout: Int
         get() = R.layout.activity_profile
@@ -44,8 +48,9 @@ class ProfileActivity : BaseActivity() {
         this.onClickDeleButton()
         this.onClickSignOutButton()
         this.onClickUpdateButton()
+       // this.updateUI()
         this.updateUIWhenCreating()
-        this.onClickCheckBoxMentor()
+        //  this.onClickCheckBoxMentor()
     }
 
     private fun onClickUpdateButton() {
@@ -54,11 +59,11 @@ class ProfileActivity : BaseActivity() {
         }
     }
 
-    fun onClickCheckBoxMentor() {
+/*    fun onClickCheckBoxMentor() {
         profile_activity_check_box_is_mentor.setOnClickListener {
             this.updateUserIsMentor()
         }
-    }
+    }*/
 
     private fun onClickSignOutButton() {
         profile_activity_button_sign_out.setOnClickListener {
@@ -87,7 +92,10 @@ class ProfileActivity : BaseActivity() {
 
         var email: String? = null
         if (this.getCurrentUser() != null) {
-            Log.e("ProfilActivity", "UpdateUIWhenCreating photo ===> ${getCurrentUser()!!.photoUrl}")
+            Log.e(
+                "ProfilActivity",
+                "UpdateUIWhenCreating photo ===> ${getCurrentUser()!!.photoUrl}"
+            )
             //Get picture URL from Firebase
 
             //Get email & username from Firebase
@@ -105,16 +113,45 @@ class ProfileActivity : BaseActivity() {
                         Glide.with(applicationContext)
                             .load(currentUser!!.urlPicture)
                             .apply(RequestOptions.circleCropTransform())
+                            .placeholder(R.drawable.ic_moustache480px)
                             .into(imageProfil!!)
+                    } else {
+                        imageProfil!!.setImageResource(R.drawable.ic_moustache480px)
                     }
-                  //  Log.e("ProfilActivity", "username ===>${currentUser!!.username}")
-                    Log.e("ProfilActivity", "in getUser =>phot url ===> ${currentUser!!.urlPicture}")
+                    //  Log.e("ProfilActivity", "username ===>${currentUser!!.username}")
+                    Log.e(
+                        "ProfilActivity",
+                        "in getUser =>phot url ===> ${currentUser!!.urlPicture}"
+                    )
                     val username =
                         if (TextUtils.isEmpty(currentUser!!.username)) getString(R.string.info_no_username_found) else currentUser.username
-
-                    this.profile_activity_check_box_is_mentor.isChecked = currentUser.isMentor!!
+                    Log.e(
+                        "ProfilActivity",
+                        "DISPLAYNAME ===> ${getCurrentUser()!!.displayName}" + "CURENTUSER ==> ${currentUser.username}"
+                    )
+                    // this.profile_activity_check_box_is_mentor.isChecked = currentUser.isMentor!!
                     textInputEditTextUsername!!.setText(username)
                 }
+        }
+    }
+
+    private fun updateUI() {
+        var email: String? = null
+        if (this.getCurrentUser() != null) {
+            email =
+                if (TextUtils.isEmpty(this.getCurrentUser()!!.email)) getString(R.string.info_no_email_found) else this.getCurrentUser()!!.email
+            this.profile_activity_text_view_email.text = email
+            val username =
+                if (TextUtils.isEmpty(getCurrentUser()!!.displayName)) getString(R.string.info_no_username_found) else getCurrentUser()!!.displayName
+            firestoreUser.addSnapshotListener { documentSnapshot, e ->
+                when {
+                    e != null -> Log.e("ERROR", e.message)
+                    documentSnapshot != null
+                            && documentSnapshot.exists() -> {
+                        textInputEditTextUsername!!.setText(username)
+                    }
+                }
+            }
         }
     }
 
@@ -137,7 +174,6 @@ class ProfileActivity : BaseActivity() {
                     this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK)
                 )
         }
-
     }
 
     private fun updateUsernameInFirebase() {

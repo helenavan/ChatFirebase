@@ -3,7 +3,7 @@
     <string name="main_activity_description">Discute avec d\'autres passionnés.</string>
 
     <string name="login">Connexion</string>
-    <string name="chat_with_mentor">Discute avec un mentor</string>
+    <string name="chat_with_mentor">Discuter</string>
 
     <!-- NOTIFICATION SERVICE -->
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
