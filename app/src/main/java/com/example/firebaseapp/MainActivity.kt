@@ -30,20 +30,23 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         coordinatorLayout = findViewById(R.id.main_activity_coordinator_layout)
         buttonLogin = findViewById(R.id.main_activity_button_login)
+        supportActionBar!!.hide()
         this.onClickLoginButton()
-        this.onClickChatButton()
+      //  this.onClickChatButton()
     }
 
     override fun onResume() {
         super.onResume()
-        this.updateUIWhenResuming()
+        if (this.isCurrentUserLogged()) {
+            this.startProfileActivity()
+        }
+       // this.updateUIWhenResuming()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         this.handleResponseAfterSignIn(requestCode, resultCode, data)
     }
-
 
     private fun handleResponseAfterSignIn(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
@@ -82,7 +85,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun onClickChatButton() {
+   /* private fun onClickChatButton() {
         main_activity_button_chat.setOnClickListener {
             if (this.isCurrentUserLogged()) {
                 this.startMentorChatActicity()
@@ -90,7 +93,7 @@ class MainActivity : BaseActivity() {
                 showSnackBar(this.coordinatorLayout!!, getString(R.string.error_not_connected))
             }
         }
-    }
+    }*/
 
     private fun startMentorChatActicity() {
         val intent: Intent = Intent(applicationContext, MentorChatActivity::class.java)
@@ -108,7 +111,7 @@ class MainActivity : BaseActivity() {
                     )
                 )
                 .setIsSmartLockEnabled(false, true)
-                .setLogo(R.drawable.ic_logo_auth)
+                .setLogo(R.drawable.ic_digital_library)
                 .build(), RC_SIGN_IN
         )
     }

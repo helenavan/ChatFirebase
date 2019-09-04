@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/main_activity_coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -9,71 +9,79 @@
 
     <!-- MAIN CONTAINER -->
     <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/appCompatImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#ffffff"
             android:scaleType="centerCrop"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"/>
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+
+    <!-- IMAGE VIEW FIREBASE OC -->
+
+    <!-- TITLE FIREBASE OC -->
+    <ImageView
+            android:id="@+id/main_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/default_large_margin"
+            android:background="@drawable/ic_digital_library"
+            app:layout_constraintBottom_toTopOf="@+id/main_title"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/main_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/default_margin"
+            android:text="@string/app_name"
+            android:textColor="#2f3032"
+            android:textSize="@dimen/default_title_size"
+            android:textStyle="bold"
+            app:fontFamily="@font/corben_regular"
+            app:layout_constraintBottom_toTopOf="@+id/main_texte"
+            app:layout_constraintEnd_toEndOf="@+id/main_logo"
+            app:layout_constraintStart_toStartOf="@+id/main_logo"
+            app:layout_constraintTop_toBottomOf="@+id/main_logo" />
+
+    <!-- DESCRIPTION FIREBASE OC -->
+    <TextView
+            android:id="@+id/main_texte"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/default_margin"
+            android:text="@string/main_activity_description"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/default_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/main_activity_button_login"
+            app:layout_constraintEnd_toEndOf="@+id/main_title"
+            app:layout_constraintStart_toStartOf="@+id/main_title"
+            app:layout_constraintTop_toBottomOf="@+id/main_title" />
+
+    <!-- BUTTON LOGIN -->
+    <Button
+            android:id="@+id/main_activity_button_login"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/default_large_margin"
+            android:background="@drawable/button_radius_primary_color"
+            android:padding="@dimen/default_large_margin"
+            android:text="@string/login"
+            android:textColor="#fff"
+            android:textSize="@dimen/default_text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_texte" />
 
-        <!-- IMAGE VIEW FIREBASE OC -->
-        <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_digital_library"
-                android:layout_margin="@dimen/default_large_margin"/>
-
-        <!-- TITLE FIREBASE OC -->
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                android:textSize="@dimen/default_title_size"
-                android:textStyle="bold"
-                android:textColor="#2f3032"
-                app:fontFamily="@font/corben_regular"
-                android:layout_margin="@dimen/default_margin"/>
-
-        <!-- DESCRIPTION FIREBASE OC -->
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/default_text_size"
-                android:text="@string/main_activity_description"
-                android:textColor="@color/colorPrimaryDark"
-                android:layout_margin="@dimen/default_margin"/>
-
-        <!-- BUTTONS CONTAINER -->
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="bottom"
-                android:orientation="vertical"
-                android:layout_margin="@dimen/default_large_margin">
-
-            <!-- BUTTON LOGIN -->
-            <Button
-                    android:id="@+id/main_activity_button_login"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/login"
-                    android:textColor="#fff"
-                    android:textSize="@dimen/default_text_size"
-                    android:background="@drawable/button_radius_primary_color"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:layout_margin="@dimen/default_large_margin"
-                    android:padding="@dimen/default_large_margin"/>
-
-            <!-- BUTTON CHAT -->
-            <Button
+    <!-- BUTTON CHAT -->
+    <!--            <Button
                     android:id="@+id/main_activity_button_chat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -83,10 +91,8 @@
                     android:background="@drawable/button_radius_accent_color"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_margin="@dimen/default_large_margin"
-                    android:padding="@dimen/default_large_margin"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
+                    android:padding="@dimen/default_large_margin"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"/>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

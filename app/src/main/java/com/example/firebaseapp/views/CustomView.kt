@@ -1,8 +1,10 @@
 package com.example.firebaseapp.views
 
 import android.graphics.Color
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.example.firebaseapp.R
 import com.google.android.material.snackbar.Snackbar
 

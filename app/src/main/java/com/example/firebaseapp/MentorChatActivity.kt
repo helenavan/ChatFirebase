@@ -70,7 +70,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         activity_mentor_chat_send_button.setOnClickListener {
             this.onClickSendMessage()
         }
-        this.onClickChatButtons()
+      //  this.onClickChatButtons()
         this.onClickAddFile()
     }
 
@@ -116,16 +116,6 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     }
 
     private fun onClickChatButtons() {
-        activity_mentor_chat_android_chat_button.setOnClickListener {
-            this.configureRecyclerView(CHAT_NAME_ANDROID)
-        }
-        activity_mentor_chat_firebase_chat_button.setOnClickListener {
-            this.configureRecyclerView(CHAT_NAME_FIREBASE)
-        }
-        activity_mentor_chat_bug_chat_button.setOnClickListener {
-            this.configureRecyclerView(CHAT_NAME_BUG)
-
-        }
     }
 
     @AfterPermissionGranted(RC_IMAGE_PERMS)

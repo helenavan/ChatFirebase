@@ -5,7 +5,7 @@ import com.google.firebase.firestore.CollectionReference
 
 
 
-private const val COLLECTION_NAME:String = "chats"
+private const val COLLECTION_NAME:String = "rooms"
 
 class ChatHelper {
 

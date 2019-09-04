@@ -8,46 +8,6 @@
         tools:context="com.example.firebaseapp.MentorChatActivity">
 
     <!-- BUTTONS CHAT CONTAINER -->
-    <LinearLayout
-            android:id="@+id/activity_mentor_chat_buttons_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-
-        <!-- BUTTON CHAT ANDROID -->
-        <ImageButton
-                android:id="@+id/activity_mentor_chat_android_chat_button"
-                android:layout_width="wrap_content"
-                android:layout_height="50dip"
-                android:layout_weight="1"
-                android:background="@color/colorGreen"
-                android:src="@drawable/ic_android_white_24dp"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:tag="10"/>
-
-        <!-- BUTTON CHAT FIREBASE -->
-        <ImageButton
-                android:id="@+id/activity_mentor_chat_firebase_chat_button"
-                android:layout_width="wrap_content"
-                android:layout_height="50dip"
-                android:layout_weight="1"
-                android:background="@color/colorSandLight"
-                android:src="@drawable/ic_cloud_white_24dp"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:tag="20"/>
-
-        <!-- BUTTON CHAT BUG -->
-        <ImageButton
-                android:id="@+id/activity_mentor_chat_bug_chat_button"
-                android:layout_width="100dp"
-                android:layout_height="50dip"
-                android:layout_weight="1"
-                android:background="@color/colorSand"
-                android:src="@drawable/ic_cloud_white_24dp"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:tag="30"/>
-
-    </LinearLayout>
 
 
     <!-- RECYCLER VIEW CONTAINER -->
@@ -56,8 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_above="@id/activity_mentor_chat_add_message_container"
-            android:layout_below="@id/activity_mentor_chat_buttons_container">
+            android:layout_above="@id/activity_mentor_chat_add_message_container">
 
         <!-- MESSAGE RECYCLER VIEW EMPTY -->
         <TextView

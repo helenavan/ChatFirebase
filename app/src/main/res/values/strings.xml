@@ -22,8 +22,8 @@
     <string name="toolbar_title_login_activity">Votre Profil</string>
     <string name="text_input_username">Nom d\'utilisateur</string>
     <string name="text_view_email">Adresse email :</string>
-    <string name="button_update_account">Mettre à jour le nom d\'utilisateur</string>
-    <string name="button_delete_account">Supprimer mon compte</string>
+    <string name="button_update_account">Mettre à jour</string>
+    <string name="button_delete_account">Supprimer \nmon compte</string>
     <string name="button_sign_out_account">Déconnexion</string>
     <string name="info_no_email_found">Auncune adresse email</string>
     <string name="info_no_username_found">Aucun nom d\'utilisateur</string>

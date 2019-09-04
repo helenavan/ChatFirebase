@@ -2,6 +2,7 @@ package com.example.firebaseapp.auth
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -11,12 +12,16 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.example.firebaseapp.MentorChatActivity
 import com.example.firebaseapp.R
 import com.example.firebaseapp.api.*
 import com.example.firebaseapp.base.BaseActivity
 import com.example.firebaseapp.models.User
+import com.example.firebaseapp.views.showSnackBar
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.textfield.TextInputEditText
@@ -24,7 +29,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_profile.*
+import kotlinx.android.synthetic.main.activity_profile.main_activity_button_chat
 import kotlinx.android.synthetic.main.activity_profile.view.*
 
 
@@ -36,6 +43,7 @@ class ProfileActivity : BaseActivity() {
 
     private var textInputEditTextUsername: EditText? = null
     private var imageProfil: ImageView? = null
+    private var linearLayout: ConstraintLayout? = null
     private val firestoreUser by lazy {
         FirebaseFirestore.getInstance().collection("users").document(getCurrentUser()!!.uid)
     }
@@ -47,9 +55,11 @@ class ProfileActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         textInputEditTextUsername = findViewById(R.id.profile_activity_edit_text_username)
         imageProfil = findViewById(R.id.profile_activity_imageview_profile)
+        linearLayout = findViewById(R.id.profile_container)
         this.onClickDeleButton()
         this.onClickSignOutButton()
         this.onClickUpdateButton()
+        this.onClickChatButton()
         this.updateUIWhenCreating()
         //  this.onClickCheckBoxMentor()
     }
@@ -60,11 +70,25 @@ class ProfileActivity : BaseActivity() {
         }
     }
 
-/*    fun onClickCheckBoxMentor() {
-        profile_activity_check_box_is_mentor.setOnClickListener {
-            this.updateUserIsMentor()
+    /*    fun onClickCheckBoxMentor() {
+            profile_activity_check_box_is_mentor.setOnClickListener {
+                this.updateUserIsMentor()
+            }
+        }*/
+    private fun onClickChatButton() {
+        this.main_activity_button_chat.setOnClickListener {
+            if (this.isCurrentUserLogged()) {
+                this.startMentorChatActicity()
+            } else {
+                // showSnackBar(this.linearLayout!!, getString(R.string.error_not_connected))
+            }
         }
-    }*/
+    }
+
+    private fun startMentorChatActicity() {
+        val intent: Intent = Intent(applicationContext, MentorChatActivity::class.java)
+        startActivity(intent)
+    }
 
     private fun onClickSignOutButton() {
         profile_activity_button_sign_out.setOnClickListener {
@@ -193,7 +217,7 @@ class ProfileActivity : BaseActivity() {
         }
     }
 
-    private fun changeNameAuth(username:String){
+    private fun changeNameAuth(username: String) {
         val profileUpdates = UserProfileChangeRequest.Builder()
             .setDisplayName(username)
             .build()
