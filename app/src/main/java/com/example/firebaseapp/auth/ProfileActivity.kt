@@ -8,11 +8,10 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.View.OnClickListener
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -20,7 +19,9 @@ import com.example.firebaseapp.MentorChatActivity
 import com.example.firebaseapp.R
 import com.example.firebaseapp.api.*
 import com.example.firebaseapp.base.BaseActivity
+import com.example.firebaseapp.models.Room
 import com.example.firebaseapp.models.User
+import com.example.firebaseapp.views.HintSpinnerAdapter
 import com.example.firebaseapp.views.showSnackBar
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.tasks.OnSuccessListener
@@ -38,12 +39,17 @@ import kotlinx.android.synthetic.main.activity_profile.view.*
 private const val SIGN_OUT_TASK: Int = 10
 private const val DELETE_USER_TASK = 20
 private const val UPDATE_USERNAME: Int = 30
+private const val NEW_SPINNER_ID = 1
 
-class ProfileActivity : BaseActivity() {
+class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
 
     private var textInputEditTextUsername: EditText? = null
     private var imageProfil: ImageView? = null
     private var linearLayout: ConstraintLayout? = null
+    var room:Room? = null
+    private var nameRoom:String? = null
+    private var list_rooms = mutableListOf<String>("room1","room2","room3")
+    private var spinner:Spinner? = null
     private val firestoreUser by lazy {
         FirebaseFirestore.getInstance().collection("users").document(getCurrentUser()!!.uid)
     }
@@ -56,6 +62,9 @@ class ProfileActivity : BaseActivity() {
         textInputEditTextUsername = findViewById(R.id.profile_activity_edit_text_username)
         imageProfil = findViewById(R.id.profile_activity_imageview_profile)
         linearLayout = findViewById(R.id.profile_container)
+        spinner = findViewById(R.id.profile_spinner)
+        spinner!!.onItemSelectedListener = this
+        this.selectItemSpinner()
         this.onClickDeleButton()
         this.onClickSignOutButton()
         this.onClickUpdateButton()
@@ -85,8 +94,40 @@ class ProfileActivity : BaseActivity() {
         }
     }
 
+    //create an array adapter for spinner
+    private fun selectItemSpinner(){
+        var arrayRooms = HintSpinnerAdapter(this, android.R.layout.simple_spinner_item)
+        arrayRooms.addAll(list_rooms)
+        arrayRooms.add("Choisissez votre room")
+        arrayRooms.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line)
+        with(spinner){
+            this!!.adapter = arrayRooms
+            //setSelection(0,false)
+            setSelection(adapter.count)
+            onItemSelectedListener = this@ProfileActivity
+            prompt = "Choisissez votre room"
+            gravity = Gravity.CENTER
+        }
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        if(spinner!!.selectedItem == "Choisissez votre room"){}
+        else{
+           // room = Room(nameRoom = list_rooms[position])
+            nameRoom = list_rooms[position]
+            Log.e("ProfileActivity", "chat selected => $nameRoom")
+            Toast.makeText(this,"item selected position: "+ list_rooms[position],Toast.LENGTH_LONG).show()
+        }
+
+    }
+
     private fun startMentorChatActicity() {
         val intent: Intent = Intent(applicationContext, MentorChatActivity::class.java)
+        intent.putExtra("room", nameRoom)
         startActivity(intent)
     }
 
@@ -117,10 +158,10 @@ class ProfileActivity : BaseActivity() {
 
         var email: String? = null
         if (this.getCurrentUser() != null) {
-            Log.e(
+          /*  Log.e(
                 "ProfilActivity",
                 "UpdateUIWhenCreating photo ===> ${getCurrentUser()!!.photoUrl}"
-            )
+            )*/
             //Get picture URL from Firebase
 
             //Get email & username from Firebase
@@ -144,16 +185,16 @@ class ProfileActivity : BaseActivity() {
                         imageProfil!!.setImageResource(R.drawable.ic_moustache480px)
                     }
                     //  Log.e("ProfilActivity", "username ===>${currentUser!!.username}")
-                    Log.e(
+                   /* Log.e(
                         "ProfilActivity",
                         "in getUser =>phot url ===> ${currentUser!!.urlPicture}"
-                    )
+                    )*/
                     val username =
                         if (TextUtils.isEmpty(currentUser!!.username)) getString(R.string.info_no_username_found) else currentUser.username
-                    Log.e(
+                    /*Log.e(
                         "ProfilActivity",
                         "DISPLAYNAME ===> ${FirebaseAuth.getInstance().currentUser!!.displayName}" + "CURENTUSER ==> ${currentUser.username}"
-                    )
+                    )*/
                     // this.profile_activity_check_box_is_mentor.isChecked = currentUser.isMentor!!
                     textInputEditTextUsername!!.setText(username)
                 }
@@ -222,15 +263,6 @@ class ProfileActivity : BaseActivity() {
             .setDisplayName(username)
             .build()
         this.getCurrentUser()!!.updateProfile(profileUpdates)
-    }
-
-    private fun updateUserIsMentor() {
-        if (this.getCurrentUser() != null) {
-            updateIsMentor(
-                this.getCurrentUser()!!.uid,
-                profile_activity_check_box_is_mentor.isChecked
-            ).addOnFailureListener(this.onFailureListener())
-        }
     }
 
     //Create OnCompleteListener called after tasks ended

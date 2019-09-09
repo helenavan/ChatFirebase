@@ -29,9 +29,10 @@ abstract class BaseActivity: AppCompatActivity() {
     // --------------------
     // UI
     // --------------------
-    protected fun configureToolbar() {
+    protected fun configureToolbar(titleAb:String) {
         val ab = supportActionBar
-        ab!!.setDisplayHomeAsUpEnabled(true)
+        ab!!.setDisplayHomeAsUpEnabled(false)
+        ab!!.title = titleAb
     }
 
     // --------------------

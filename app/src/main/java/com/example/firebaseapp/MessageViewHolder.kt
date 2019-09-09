@@ -52,8 +52,6 @@ class MessageViewHolder(item: View) :
         profileContainer = itemView.findViewById(R.id.activity_mentor_chat_item_profile_container)
         this.imageViewProfile =
             itemView.findViewById(R.id.activity_mentor_chat_item_profile_container_profile_image)
-        imageViewIsMentor =
-            itemView.findViewById(R.id.activity_mentor_chat_item_profile_container_is_mentor_image)
         messageContainer = itemView.findViewById(R.id.activity_mentor_chat_item_message_container)
         this.cardViewImageSent =
             itemView.findViewById(R.id.activity_mentor_chat_item_message_container_image_sent_cardview)
@@ -83,8 +81,8 @@ class MessageViewHolder(item: View) :
             textViewDate!!.text = message.dateCreated
 
         // Update isMentor ImageView
-        this.imageViewIsMentor!!.visibility =
-            if (message.userSender!!.isMentor) View.VISIBLE else View.INVISIBLE
+/*        this.imageViewIsMentor!!.visibility =
+            if (message.userSender!!.isMentor) View.VISIBLE else View.INVISIBLE*/
 
         // Update profile picture ImageView
         if (message.userSender!!.urlPicture != null){

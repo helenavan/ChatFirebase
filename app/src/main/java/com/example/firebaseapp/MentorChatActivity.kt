@@ -23,6 +23,7 @@ import com.example.firebaseapp.api.getUser
 import com.example.firebaseapp.base.BaseActivity
 import com.example.firebaseapp.models.User
 import com.example.firebaseapp.models.Message
+import com.example.firebaseapp.models.Room
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.firestore.Query
@@ -48,7 +49,6 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     private var textViewRecyclerViewEmpty: TextView? = null
     private var imageViewPreview: ImageView? = null
     private var recyclerView: RecyclerView? = null
-    // private var pathImageSavedInFirebase: String? = null
 
     override val fragmentLayout: Int
         get() = R.layout.activity_mentor_chat
@@ -63,17 +63,20 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         editTextMessage = findViewById(R.id.activity_mentor_chat_message_edit_text)
         dateChat = convertDateToHour()
         //show chat
-        this.configureRecyclerView(CHAT_NAME_ANDROID)
-        this.configureToolbar()
+        val intent = intent
+        val nameRoom = intent.getStringExtra("room")
+        if(nameRoom != null)this.configureRecyclerView(nameRoom)
+        Log.e("MentorActivity", "name ROOM => $nameRoom")
+        this.configureToolbar(nameRoom)
         this.getCurrentUserFromFirestore()
 
         activity_mentor_chat_send_button.setOnClickListener {
             this.onClickSendMessage()
         }
-      //  this.onClickChatButtons()
         this.onClickAddFile()
     }
 
+    //Permission
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -113,9 +116,6 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
                 this.imageViewPreview!!.setImageDrawable(null)
             }
         }
-    }
-
-    private fun onClickChatButtons() {
     }
 
     @AfterPermissionGranted(RC_IMAGE_PERMS)
@@ -247,7 +247,6 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     }
 
     companion object {
-
         // STATIC DATA FOR CHAT
         private val CHAT_NAME_ANDROID = "android"
         private val CHAT_NAME_BUG = "bug"

@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.core.OnlineState
 
 private  const val COLLECTION_NAME:String = "users"
 
@@ -29,10 +30,6 @@ fun getUser(uid: String): Task<DocumentSnapshot> {
 
 fun updateUsername(username: String, uid: String): Task<Void> {
     return getUsersCollection().document(uid).update("username", username)
-}
-
-fun updateIsMentor(uid: String, isMentor: Boolean?): Task<Void> {
-    return getUsersCollection().document(uid).update("isMentor", isMentor)
 }
 
 // --- DELETE ---

@@ -95,11 +95,6 @@ class MainActivity : BaseActivity() {
         }
     }*/
 
-    private fun startMentorChatActicity() {
-        val intent: Intent = Intent(applicationContext, MentorChatActivity::class.java)
-        startActivity(intent)
-    }
-
     private fun startSignInActivity() {
         startActivityForResult(
             AuthUI.getInstance()
