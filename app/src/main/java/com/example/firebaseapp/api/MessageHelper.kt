@@ -32,7 +32,7 @@ class MessageHelper {
             val message = Message(textMessage,userSender =  userSender, dateCreated =dateMessage )
 
             //store Message to Firestore
-            return ChatHelper.getChatCollection().document(chat).collection(COLLECTION_NAME)
+            return getChatCollection().document(chat).collection(COLLECTION_NAME)
                 .add(message)//add() permet de d'ajouter un id unique au message
         }
 

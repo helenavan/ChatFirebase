@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools" package="com.example.firebaseapp">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
             android:allowBackup="true"
-            android:icon="@drawable/ic_logo_auth"
+            android:icon="@drawable/ic_digital_library"
             android:label="@string/app_name"
             android:roundIcon="@drawable/ic_digital_library"
             android:supportsRtl="true"
@@ -32,11 +33,25 @@
 
         <!-- NOTIFICATION SERVICE-->
         <service
-                android:name=".notifications.NotificationsService">
+                android:name=".notifications.NotificationsService"
+                android:exported="false"
+                android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+        <service android:name=".notifications.MyFirebaseInstanceIDService" />
+        <service android:name=".notifications.LikeService" />
+
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_icon"
+                android:resource="@mipmap/ic_launcher" />
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_color"
+                android:resource="@color/colorSandLight" />
+        <meta-data android:name="com.google.android.gms.version"
+                android:value="@integer/google_play_services_version" />
+
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
     </application>
 

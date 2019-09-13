@@ -19,17 +19,23 @@ import com.example.firebaseapp.MentorChatActivity
 import com.example.firebaseapp.R
 import com.example.firebaseapp.api.*
 import com.example.firebaseapp.base.BaseActivity
+import com.example.firebaseapp.getListUID
+
+import com.example.firebaseapp.models.Friend
+import com.example.firebaseapp.models.Friends
 import com.example.firebaseapp.models.Room
 import com.example.firebaseapp.models.User
 import com.example.firebaseapp.views.HintSpinnerAdapter
 import com.example.firebaseapp.views.showSnackBar
 import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.main_activity_button_chat
@@ -46,7 +52,6 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
     private var textInputEditTextUsername: EditText? = null
     private var imageProfil: ImageView? = null
     private var linearLayout: ConstraintLayout? = null
-    var room:Room? = null
     private var nameRoom:String? = null
     private var list_rooms = mutableListOf<String>("room1","room2","room3")
     private var spinner:Spinner? = null
@@ -70,20 +75,16 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
         this.onClickUpdateButton()
         this.onClickChatButton()
         this.updateUIWhenCreating()
-        //  this.onClickCheckBoxMentor()
+
     }
 
     private fun onClickUpdateButton() {
         profile_activity_button_update.setOnClickListener {
             this.updateUsernameInFirebase()
+            this.createFriendsList()
         }
     }
 
-    /*    fun onClickCheckBoxMentor() {
-            profile_activity_check_box_is_mentor.setOnClickListener {
-                this.updateUserIsMentor()
-            }
-        }*/
     private fun onClickChatButton() {
         this.main_activity_button_chat.setOnClickListener {
             if (this.isCurrentUserLogged()) {
@@ -126,9 +127,13 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
     }
 
     private fun startMentorChatActicity() {
-        val intent: Intent = Intent(applicationContext, MentorChatActivity::class.java)
-        intent.putExtra("room", nameRoom)
-        startActivity(intent)
+        if(nameRoom != null){
+            val intent: Intent = Intent(applicationContext, MentorChatActivity::class.java)
+            intent.putExtra("room", nameRoom)
+            startActivity(intent)
+        }else{
+            Toast.makeText(this,"Vous n'avez pas choisi de salon",Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun onClickSignOutButton() {
@@ -184,18 +189,8 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
                     } else {
                         imageProfil!!.setImageResource(R.drawable.ic_moustache480px)
                     }
-                    //  Log.e("ProfilActivity", "username ===>${currentUser!!.username}")
-                   /* Log.e(
-                        "ProfilActivity",
-                        "in getUser =>phot url ===> ${currentUser!!.urlPicture}"
-                    )*/
                     val username =
                         if (TextUtils.isEmpty(currentUser!!.username)) getString(R.string.info_no_username_found) else currentUser.username
-                    /*Log.e(
-                        "ProfilActivity",
-                        "DISPLAYNAME ===> ${FirebaseAuth.getInstance().currentUser!!.displayName}" + "CURENTUSER ==> ${currentUser.username}"
-                    )*/
-                    // this.profile_activity_check_box_is_mentor.isChecked = currentUser.isMentor!!
                     textInputEditTextUsername!!.setText(username)
                 }
         }
@@ -276,4 +271,12 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
         }
     }
 
+    //Create a list of friends
+    private fun createFriendsList(){
+       val listF= getListUID("users",
+            firestoreUser.id)
+        Log.d("ProfileActivity", "my friends : $listF")
+        //FriendHelper.creatFriend(firestoreUser.id, )
+        updateListFriends(firestoreUser.id,listF)
+    }
 }

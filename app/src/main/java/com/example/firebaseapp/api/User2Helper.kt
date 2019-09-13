@@ -1,11 +1,12 @@
 package com.example.firebaseapp.api
 
+import com.example.firebaseapp.api.ListFriendsHelper.Companion.getFriendsCollection
+import com.example.firebaseapp.models.Friend
 import com.example.firebaseapp.models.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.core.OnlineState
 
 private  const val COLLECTION_NAME:String = "users"
 
@@ -16,7 +17,7 @@ fun getUsersCollection(): CollectionReference {
 // --- CREATE ---
 
 fun createUser(uid: String, username: String, urlPicture: String): Task<Void> {
-    val userToCreate = User(uid = uid, username = username, urlPicture = urlPicture)
+    val userToCreate = User(uid = uid, username = username, urlPicture = urlPicture )
     return getUsersCollection().document(uid).set(userToCreate)
 }
 
@@ -32,6 +33,9 @@ fun updateUsername(username: String, uid: String): Task<Void> {
     return getUsersCollection().document(uid).update("username", username)
 }
 
+fun updateListFriends(uid:String,listF:List<Friend>):Task<Void>{
+    return getUsersCollection().document(uid).update("friends",listF)
+}
 // --- DELETE ---
 
 fun deleteUser(uid: String): Task<Void> {

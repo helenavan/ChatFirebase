@@ -13,6 +13,7 @@ import com.example.firebaseapp.views.showSnackBar
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -22,6 +23,9 @@ class MainActivity : BaseActivity() {
 
     private var coordinatorLayout: ConstraintLayout? = null
     private var buttonLogin: Button? = null
+    private val firestoreUser by lazy {
+        FirebaseFirestore.getInstance().collection("users").document(getCurrentUser()!!.uid)
+    }
 
     override val fragmentLayout: Int
         get() = R.layout.activity_main
@@ -85,16 +89,6 @@ class MainActivity : BaseActivity() {
         }
     }
 
-   /* private fun onClickChatButton() {
-        main_activity_button_chat.setOnClickListener {
-            if (this.isCurrentUserLogged()) {
-                this.startMentorChatActicity()
-            } else {
-                showSnackBar(this.coordinatorLayout!!, getString(R.string.error_not_connected))
-            }
-        }
-    }*/
-
     private fun startSignInActivity() {
         startActivityForResult(
             AuthUI.getInstance()
@@ -133,9 +127,11 @@ class MainActivity : BaseActivity() {
                 this.getCurrentUser()!!.uid,
                 this.getCurrentUser()!!.displayName!!,
                 this.getCurrentUser()!!.photoUrl.toString()
+
             )
                 .addOnFailureListener(this.onFailureListener())
         }
-        Log.e("MainActivity", "getCurrentuser displayname==> ${getCurrentUser()!!.displayName}")
+       // Log.e("MainActivity", "getCurrentuser displayname==> ${getCurrentUser()!!.displayName}")
+
     }
 }

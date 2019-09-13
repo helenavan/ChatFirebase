@@ -12,8 +12,11 @@ import android.app.PendingIntent
 import android.content.Context
 import com.example.firebaseapp.MainActivity
 import android.content.Intent
+import android.graphics.Color
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.firebaseapp.R
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.RemoteMessage
 
 
@@ -31,6 +34,11 @@ class NotificationsService: FirebaseMessagingService() {
         }
     }
 
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        Log.d("NotificationService", "Refreshed token: $token")
+
+    }
 
     private fun sendVisualNotification(messageBody: String?) {
 
@@ -67,8 +75,18 @@ class NotificationsService: FirebaseMessagingService() {
             val mChannel = NotificationChannel(channelId, channelName, importance)
             notificationManager.createNotificationChannel(mChannel)
         }
-
         // Show notification
         notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build())
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        isAppRunning = false
+    }
+
+    companion object {
+
+        var isAppRunning: Boolean = false
+    }
+
 }

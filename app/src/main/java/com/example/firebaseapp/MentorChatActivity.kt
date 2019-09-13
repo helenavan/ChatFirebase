@@ -1,9 +1,13 @@
 package com.example.firebaseapp
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -23,7 +27,6 @@ import com.example.firebaseapp.api.getUser
 import com.example.firebaseapp.base.BaseActivity
 import com.example.firebaseapp.models.User
 import com.example.firebaseapp.models.Message
-import com.example.firebaseapp.models.Room
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.firestore.Query
@@ -56,6 +59,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         recyclerView = findViewById(R.id.activity_mentor_chat_recycler_view)
         textViewRecyclerViewEmpty =
             findViewById(R.id.activity_mentor_chat_text_view_recycler_view_empty)
@@ -65,15 +69,19 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
         //show chat
         val intent = intent
         val nameRoom = intent.getStringExtra("room")
-        if(nameRoom != null)this.configureRecyclerView(nameRoom)
+        if(nameRoom != null){
+            this.configureRecyclerView(nameRoom)
+            this.configureToolbar(nameRoom)
+        }
         Log.e("MentorActivity", "name ROOM => $nameRoom")
-        this.configureToolbar(nameRoom)
+
         this.getCurrentUserFromFirestore()
 
         activity_mentor_chat_send_button.setOnClickListener {
             this.onClickSendMessage()
         }
         this.onClickAddFile()
+        this.sendNotification()
     }
 
     //Permission
@@ -95,7 +103,6 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     // ACTIONS
     // --------------------
 
-
     private fun onClickSendMessage() {
         if (!TextUtils.isEmpty(editTextMessage!!.text) && modelCurrentUser != null) {
             // Check if the ImageView is set
@@ -116,6 +123,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
                 this.imageViewPreview!!.setImageDrawable(null)
             }
         }
+
     }
 
     @AfterPermissionGranted(RC_IMAGE_PERMS)
@@ -247,11 +255,6 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     }
 
     companion object {
-        // STATIC DATA FOR CHAT
-        private val CHAT_NAME_ANDROID = "android"
-        private val CHAT_NAME_BUG = "bug"
-        private val CHAT_NAME_FIREBASE = "firebase"
-
         // STATIC DATA FOR PICTURE
         private val PERMS = Manifest.permission.READ_EXTERNAL_STORAGE
         private const val RC_IMAGE_PERMS = 100
@@ -273,4 +276,32 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
 
         return current.format(formatter)
     }
+
+    private fun sendNotification(){
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channelId = "1"
+        val channel2 = "2"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(channelId,
+                "Channel 1", NotificationManager.IMPORTANCE_HIGH)
+
+            notificationChannel.description = "This is BNT"
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.setShowBadge(true)
+            notificationManager.createNotificationChannel(notificationChannel)
+
+            val notificationChannel2 = NotificationChannel(channel2,
+                "Channel 2", NotificationManager.IMPORTANCE_MIN)
+
+            notificationChannel.description = "This is bTV"
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.setShowBadge(true)
+            notificationManager.createNotificationChannel(notificationChannel2)
+
+        }
+    }
+
 }
