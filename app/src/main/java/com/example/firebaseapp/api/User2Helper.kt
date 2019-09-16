@@ -16,8 +16,8 @@ fun getUsersCollection(): CollectionReference {
 
 // --- CREATE ---
 
-fun createUser(uid: String, username: String, urlPicture: String): Task<Void> {
-    val userToCreate = User(uid = uid, username = username, urlPicture = urlPicture )
+fun createUser(uid: String, username: String, urlPicture: String,listF:List<Friend>): Task<Void> {
+    val userToCreate = User(uid = uid, username = username, urlPicture = urlPicture,friends = listF)
     return getUsersCollection().document(uid).set(userToCreate)
 }
 

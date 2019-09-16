@@ -14,7 +14,7 @@ class FriendHelper {
     companion object{
 
         fun creatFriend(uid:String,idFriend:String):Task<DocumentReference>{
-            val friendUser = Friend(idFriend,true)
+            val friendUser = Friend(idFriend,true,true)
             return getFriendsCollection().document(uid).collection(COLLECTION_NAME).add(friendUser)
         }
 

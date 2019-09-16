@@ -33,7 +33,7 @@ class MessageHelper {
 
             //store Message to Firestore
             return getChatCollection().document(chat).collection(COLLECTION_NAME)
-                .add(message)//add() permet de d'ajouter un id unique au message
+                .add(message)//add() permet d'ajouter un id unique au message
         }
 
         fun createMessageWithImageForChat(

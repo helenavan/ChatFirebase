@@ -9,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.firebaseapp.api.createUser
 import com.example.firebaseapp.auth.ProfileActivity
 import com.example.firebaseapp.base.BaseActivity
+import com.example.firebaseapp.models.Friend
 import com.example.firebaseapp.views.showSnackBar
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
@@ -23,9 +24,7 @@ class MainActivity : BaseActivity() {
 
     private var coordinatorLayout: ConstraintLayout? = null
     private var buttonLogin: Button? = null
-    private val firestoreUser by lazy {
-        FirebaseFirestore.getInstance().collection("users").document(getCurrentUser()!!.uid)
-    }
+    private var listF:String? = null
 
     override val fragmentLayout: Int
         get() = R.layout.activity_main
@@ -122,11 +121,14 @@ class MainActivity : BaseActivity() {
     // REST REQUEST when disconnect and reconnect
     // --------------------
     private fun createUserInFirestore() {
+        val listF= getListUID("users",
+            getCurrentUser()!!.uid)
         if (this.getCurrentUser() != null) {
             createUser(
                 this.getCurrentUser()!!.uid,
                 this.getCurrentUser()!!.displayName!!,
-                this.getCurrentUser()!!.photoUrl.toString()
+                this.getCurrentUser()!!.photoUrl.toString(),
+                listF
 
             )
                 .addOnFailureListener(this.onFailureListener())

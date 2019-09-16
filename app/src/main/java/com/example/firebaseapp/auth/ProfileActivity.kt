@@ -75,7 +75,7 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
         this.onClickUpdateButton()
         this.onClickChatButton()
         this.updateUIWhenCreating()
-
+       // this.createFriendsList()
     }
 
     private fun onClickUpdateButton() {
@@ -99,14 +99,15 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
     private fun selectItemSpinner(){
         var arrayRooms = HintSpinnerAdapter(this, android.R.layout.simple_spinner_item)
         arrayRooms.addAll(list_rooms)
-        arrayRooms.add("Choisissez votre room")
+       // arrayRooms.add("Choisissez votre room")
+        arrayRooms.add(getString(R.string.title_spinner))
         arrayRooms.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line)
         with(spinner){
             this!!.adapter = arrayRooms
             //setSelection(0,false)
             setSelection(adapter.count)
             onItemSelectedListener = this@ProfileActivity
-            prompt = "Choisissez votre room"
+            prompt = getString(R.string.title_spinner)
             gravity = Gravity.CENTER
         }
     }
@@ -116,7 +117,7 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if(spinner!!.selectedItem == "Choisissez votre room"){}
+        if(spinner!!.selectedItem == getString(R.string.title_spinner)){}
         else{
            // room = Room(nameRoom = list_rooms[position])
             nameRoom = list_rooms[position]
@@ -179,6 +180,7 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
             // 5 - Get additional data from Firestore
             getUser(this.getCurrentUser()!!.uid)
                 .addOnSuccessListener { documentSnapshot ->
+                    val currentFriend = documentSnapshot.toObject(Friend::class.java)
                     val currentUser = documentSnapshot.toObject(User::class.java)
                     if (this.getCurrentUser()!!.photoUrl != null) {
                         Glide.with(applicationContext)
@@ -277,6 +279,6 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
             firestoreUser.id)
         Log.d("ProfileActivity", "my friends : $listF")
         //FriendHelper.creatFriend(firestoreUser.id, )
-        updateListFriends(firestoreUser.id,listF)
+      //  updateListFriends(firestoreUser.id,listF)
     }
 }

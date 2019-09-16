@@ -25,6 +25,7 @@ import com.example.firebaseapp.api.MessageHelper
 import com.example.firebaseapp.api.MessageHelper.Companion.getAllMessageForChat
 import com.example.firebaseapp.api.getUser
 import com.example.firebaseapp.base.BaseActivity
+import com.example.firebaseapp.models.Friend
 import com.example.firebaseapp.models.User
 import com.example.firebaseapp.models.Message
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -43,6 +44,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
     // FOR DATA
     private var mentorChatAdapter: MentorChatAdapter? = null
     private var modelCurrentUser: User? = null
+    private var modelFriend:Friend? = null
     private var currentChatName: String? = null
     private var uriImageSelected: Uri? = null
     private var dateChat: String? = null
@@ -138,6 +140,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
 
     private fun getCurrentUserFromFirestore() {
         getUser(getCurrentUser()!!.uid).addOnSuccessListener { documentSnapshot ->
+            modelFriend = documentSnapshot.toObject<Friend>(Friend::class.java)
             modelCurrentUser = documentSnapshot.toObject<User>(User::class.java)
         }
     }
