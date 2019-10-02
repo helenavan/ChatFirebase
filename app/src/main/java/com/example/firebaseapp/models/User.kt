@@ -2,10 +2,14 @@ package com.example.firebaseapp.models
 
 import com.google.firebase.firestore.core.OnlineState
 
-data class User(var uid:String? = null,
-                var username:String? = null,
+data class User(var username:String? = null,
+                var bio:String,
                 var urlPicture:String? = null,
-                var friends:List<Friend>? = null)
+                val registrationTokens: MutableList<String>){
+    constructor(): this("", "", "null", mutableListOf())
+}
+
+
 
 
 

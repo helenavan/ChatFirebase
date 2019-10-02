@@ -140,7 +140,7 @@ class MentorChatActivity : BaseActivity(), MentorChatAdapter.Listener {
 
     private fun getCurrentUserFromFirestore() {
         getUser(getCurrentUser()!!.uid).addOnSuccessListener { documentSnapshot ->
-            modelFriend = documentSnapshot.toObject<Friend>(Friend::class.java)
+          //  modelFriend = documentSnapshot.toObject<Friend>(Friend::class.java)
             modelCurrentUser = documentSnapshot.toObject<User>(User::class.java)
         }
     }

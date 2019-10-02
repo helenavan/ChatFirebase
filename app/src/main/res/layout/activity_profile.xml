@@ -144,7 +144,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/default_large_margin"
-            android:columnCount="2"
+            android:columnCount="3"
             android:orientation="vertical"
             android:rowCount="4"
             app:layout_constraintBottom_toBottomOf="@+id/profile_back_buttons"
@@ -199,6 +199,15 @@
                 android:text="@string/button_update_account"
                 android:textAlignment="center"
                 android:textSize="@dimen/text_button_size" />
+        <!--button list friends-->
+        <Button
+                android:id="@+id/profile_activity_button_listOffriends"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:text="mes cop"
+                android:textSize="12sp"
+                android:layout_row="0"
+                android:layout_column="2"/>
 
         <!-- BUTTON SIGN OUT -->
         <Button

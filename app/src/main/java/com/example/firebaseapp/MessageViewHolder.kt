@@ -69,7 +69,7 @@ class MessageViewHolder(item: View) :
     fun updateWithMessage(message: Message, currentUserId: String) {
 
         // Check if current user is the sender
-        val isCurrentUser = message.userSender!!.uid.equals(currentUserId)
+        val isCurrentUser = message.userSender!!.bio.equals(currentUserId)
         val storageReference = FirebaseStorage.getInstance().reference
         // Update message TextView
         this.textViewMessage!!.text = message.message

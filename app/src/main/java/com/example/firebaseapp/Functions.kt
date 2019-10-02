@@ -1,35 +1,47 @@
 package com.example.firebaseapp
 
 import android.util.Log
-import com.example.firebaseapp.api.updateListFriends
 import com.example.firebaseapp.models.Friend
-import com.example.firebaseapp.models.Friends
 import com.example.firebaseapp.models.User
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.iid.FirebaseInstanceId
 
-fun getListUID(rootCollection: String, userID: String): List<Friend>{
+fun getListUID(rootCollection: String, userID: String, isOnline:Boolean):List<User>{
 
-    var friend:Friend
-    val list = mutableListOf<Friend>()
+    var user: User? = null
+    val list = mutableListOf<User>()
     val db = FirebaseFirestore.getInstance()
+    var nameFriend:String? = null
     db.collection(rootCollection).get()
-        .addOnCompleteListener(OnCompleteListener<QuerySnapshot> { task ->
+        .addOnCompleteListener{ task ->
             if (task.isSuccessful) {
 
                 for (document in task.result!!) {
                     //TODO booleans
-                    friend = Friend(idFriends = document.id, isConnected = true,isFriend =  true)
+                   // friend = Friend(idFriends = document.id, connected = isonline)
+                     nameFriend = document.get("username") as String
+                    user = User(bio = document.id,username = nameFriend, registrationTokens = mutableListOf())
                     if (document.id != userID) {
-                        list.add(friend)
+                         list.add(user!!)
+                   //  creatFriend(document.id,userID, online = isonline)
+                      //  Log.d("Function_connected", "Value :  $truc")
                     }
                 }
-                updateListFriends(userID,list)
-                Log.d("Function_getUID", list.toString() + "userID :  $userID")
+              //  updateFriends(userID,friend!!)
+                Log.d("Function_getUID", user.toString() + " current userID :  $userID")
             } else {
                 Log.e("getUID", "Error getting documents: ", task.exception)
             }
-        })
+        }
     return list
 }
+
+/*
+//to retrieve string isonline
+getFriendOnline(document.id, object: MyCallback{
+    override fun onCallback(value: String) {
+        connected = value
+
+        Log.d("Function_connected", "Value :  $connected")
+    }
+})*/

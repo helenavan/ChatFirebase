@@ -1,45 +1,34 @@
 package com.example.firebaseapp.auth
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.text.TextUtils
-import android.text.TextWatcher
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.view.View.OnClickListener
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.firebaseapp.MentorChatActivity
+import com.example.firebaseapp.MyCallback
 import com.example.firebaseapp.R
+import com.example.firebaseapp.activities.FriendsListActivity
 import com.example.firebaseapp.api.*
 import com.example.firebaseapp.base.BaseActivity
-import com.example.firebaseapp.getListUID
-
 import com.example.firebaseapp.models.Friend
-import com.example.firebaseapp.models.Friends
-import com.example.firebaseapp.models.Room
 import com.example.firebaseapp.models.User
 import com.example.firebaseapp.views.HintSpinnerAdapter
-import com.example.firebaseapp.views.showSnackBar
 import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase.getInstance
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_profile.*
-import kotlinx.android.synthetic.main.activity_profile.main_activity_button_chat
-import kotlinx.android.synthetic.main.activity_profile.view.*
 
 
 private const val SIGN_OUT_TASK: Int = 10
@@ -55,6 +44,7 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
     private var nameRoom:String? = null
     private var list_rooms = mutableListOf<String>("room1","room2","room3")
     private var spinner:Spinner? = null
+    private var isonline:String? = null
     private val firestoreUser by lazy {
         FirebaseFirestore.getInstance().collection("users").document(getCurrentUser()!!.uid)
     }
@@ -75,13 +65,32 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
         this.onClickUpdateButton()
         this.onClickChatButton()
         this.updateUIWhenCreating()
+        this.onClickFriendList()
+        makeUserOnline(firestoreUser.id)
        // this.createFriendsList()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        makeUserOffline(firestoreUser.id)
     }
 
     private fun onClickUpdateButton() {
         profile_activity_button_update.setOnClickListener {
             this.updateUsernameInFirebase()
-            this.createFriendsList()
+          // val ure = getListUID("users",firestoreUser.id,true)
+            val docRef = getFriend(firestoreUser.id)
+            docRef.addOnSuccessListener{
+                docu ->
+                if(docu != null){
+                    val document = docu.id
+                    Log.d("ProfilActivity","id friend?=>  $document")
+                }
+            }
+
+            val friend = Friend("","euh")
+            subcreateFriend(firestoreUser.id,friend)
+           // this.createFriendsList()
         }
     }
 
@@ -95,11 +104,16 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
         }
     }
 
+    private fun onClickFriendList(){
+        this.profile_activity_button_listOffriends.setOnClickListener{
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
+    }
     //create an array adapter for spinner
     private fun selectItemSpinner(){
         var arrayRooms = HintSpinnerAdapter(this, android.R.layout.simple_spinner_item)
         arrayRooms.addAll(list_rooms)
-       // arrayRooms.add("Choisissez votre room")
         arrayRooms.add(getString(R.string.title_spinner))
         arrayRooms.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line)
         with(spinner){
@@ -124,7 +138,6 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
             Log.e("ProfileActivity", "chat selected => $nameRoom")
             Toast.makeText(this,"item selected position: "+ list_rooms[position],Toast.LENGTH_LONG).show()
         }
-
     }
 
     private fun startMentorChatActicity() {
@@ -147,7 +160,6 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
     private fun onClickDeleButton() {
         profile_activity_button_delete.setOnClickListener {
             val builder = AlertDialog.Builder(this)
-
             builder.setMessage(R.string.popup_message_confirmation_delete_account)
             builder.setPositiveButton(R.string.popup_message_choice_yes, ({ dialog, which ->
                 deleteUserFromFirebase()
@@ -157,11 +169,9 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
             val dialog: AlertDialog = builder.create()
             dialog.show()
         }
-
     }
 
     private fun updateUIWhenCreating() {
-
         var email: String? = null
         if (this.getCurrentUser() != null) {
           /*  Log.e(
@@ -180,7 +190,6 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
             // 5 - Get additional data from Firestore
             getUser(this.getCurrentUser()!!.uid)
                 .addOnSuccessListener { documentSnapshot ->
-                    val currentFriend = documentSnapshot.toObject(Friend::class.java)
                     val currentUser = documentSnapshot.toObject(User::class.java)
                     if (this.getCurrentUser()!!.photoUrl != null) {
                         Glide.with(applicationContext)
@@ -275,10 +284,36 @@ class ProfileActivity : BaseActivity(),AdapterView.OnItemSelectedListener {
 
     //Create a list of friends
     private fun createFriendsList(){
-       val listF= getListUID("users",
-            firestoreUser.id)
-        Log.d("ProfileActivity", "my friends : $listF")
-        //FriendHelper.creatFriend(firestoreUser.id, )
-      //  updateListFriends(firestoreUser.id,listF)
+        getFriendOnline(firestoreUser.id, object: MyCallback{
+            override fun onCallback(value: String) {
+                isonline = value
+
+                Log.d("Function_connected", "Value :  $isonline")
+            }
+        })
+      // val listF= getListUID("users",
+       //     firestoreUser.id, isonline!!)
+       // Log.d("ProfileActivity", "my friends : $listF")
+       // getFriendOnline(firestoreUser.id,"users")
+    }
+    //for Database
+    private fun getFriendOnline(friendID: String,myCallback:MyCallback){
+        var userOnlineState:Any = 0
+        val dataref = getInstance().getReference("status/$friendID")
+        Log.d("Function", "dataRef => $dataref")
+        val refS = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                userOnlineState = dataSnapshot.value!!
+                // val userOnlineState = dataSnapshot.getValue(Friend::class.java)!!
+                isonline = userOnlineState.toString()
+                // getListUID(friendID,rootCollection,isonline)
+                 myCallback.onCallback(isonline!!)
+                Log.d("Function", "ONLINE?:  $isonline" + "getListUID : => : $")
+            }
+
+            override fun onCancelled(dataE: DatabaseError) {
+            }
+        }
+        dataref.addValueEventListener(refS)
     }
 }

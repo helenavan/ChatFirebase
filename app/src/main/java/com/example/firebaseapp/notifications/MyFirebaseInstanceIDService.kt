@@ -16,6 +16,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.firebaseapp.MentorChatActivity
 import com.example.firebaseapp.R
+import com.example.firebaseapp.api.getFCMRegistrationTokens
+import com.example.firebaseapp.api.setFCMRegistrationTokens
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -24,7 +26,9 @@ import java.util.Random
 import java.net.HttpURLConnection
 import java.net.URL
 
-
+private const val NOTIFICATION_ID_EXTRA = "notificationId"
+private const val IMAGE_URL_EXTRA = "imageUrl"
+private const val ADMIN_CHANNEL_ID = "admin_channel"
 const val TAG:String = "MyFirebaseIIDService"
 
 class MyFirebaseInstanceIDService: FirebaseMessagingService() {
@@ -105,6 +109,7 @@ class MyFirebaseInstanceIDService: FirebaseMessagingService() {
 
     }
 
+
     private fun getBitmapFromUrl(imageUrl: String?): Bitmap? {
         return try {
             val url = URL(imageUrl)
@@ -121,8 +126,16 @@ class MyFirebaseInstanceIDService: FirebaseMessagingService() {
     }
 
     companion object {
-        private const val NOTIFICATION_ID_EXTRA = "notificationId"
-        private const val IMAGE_URL_EXTRA = "imageUrl"
-        private const val ADMIN_CHANNEL_ID = "admin_channel"
+        fun addTokenToFirestore(newRegistrationToken: String?) {
+            if (newRegistrationToken == null) throw NullPointerException("FCM token is null.")
+
+            getFCMRegistrationTokens { tokens ->
+                if (tokens.contains(newRegistrationToken))
+                    return@getFCMRegistrationTokens
+
+                tokens.add(newRegistrationToken)
+                setFCMRegistrationTokens(tokens)
+            }
+        }
     }
 }
